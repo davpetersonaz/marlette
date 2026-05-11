@@ -31,11 +31,26 @@ app.use(session({
 	cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 } // 7 days
 }));
 
+// Helper to pass admin status to all views
+app.use((req, res, next) => {
+	res.locals.adminLoggedIn = !!req.session.admin;
+	res.locals.adminName = req.session.adminName || null;
+	next();
+});
+
 // PostgreSQL Pool
 const pool = new Pool({
 	connectionString: process.env.DATABASE_URL,
 	ssl: false
 });
+
+// Admin Protection Middleware
+const requireAdmin = (req, res, next) => {
+	if (!req.session.admin) {
+		return res.redirect('/admin/login');
+	}
+	next();
+};
 
 // Routes
 app.get('/', (req, res) => res.render('index'));
@@ -99,21 +114,17 @@ app.post('/contact', async (req, res) => {
 
 // ADMIN ROUTES
 app.get('/admin', (req, res) => {
-	if (req.session.admin) {
-		res.redirect('/admin/dashboard');
-	} else {
-		res.redirect('/admin/login');
-	}
+	res.redirect(req.session.admin ? '/admin/dashboard' : '/admin/login');
 });
 
 app.get('/admin/login', (req, res) => {
 	res.render('admin-login', { error: false });
 });
 
+// ADMIN LOGIN - Uses real admins table
 app.post('/admin/login', async (req, res) => {
 	const { username, password } = req.body;
 	try {
-		// Try email or name
 		const result = await pool.query(
 			'SELECT * FROM admins WHERE (email = $1 OR name = $1) AND active = true',
 			[username]
@@ -127,7 +138,7 @@ app.post('/admin/login', async (req, res) => {
 		if (match) {
 			req.session.admin = true;
 			req.session.adminEmail = admin.email;
-			req.session.adminName = admin.name;
+			req.session.adminName = admin.name || admin.email;
 			return res.redirect('/admin/dashboard');
 		} else {
 			return res.render('admin-login', { error: true });
@@ -139,8 +150,7 @@ app.post('/admin/login', async (req, res) => {
 });
 
 // Dashboard with Show Deleted support
-app.get('/admin/dashboard', async (req, res) => {
-	if (!req.session.admin) return res.redirect('/admin/login');
+app.get('/admin/dashboard', requireAdmin, async (req, res) => {
 	const showDeleted = req.query.showDeleted === 'true';
 	try {
 		const result = await pool.query(`
@@ -159,16 +169,14 @@ app.get('/admin/dashboard', async (req, res) => {
 });
 
 // Toggle Highlight
-app.post('/admin/highlight', async (req, res) => {
-	if (!req.session.admin) return res.status(401).send('Unauthorized');
+app.post('/admin/highlight', requireAdmin, async (req, res) => {
 	const { id, highlighted } = req.body;
 	await pool.query('UPDATE submissions SET highlighted = $1 WHERE id = $2', [highlighted, id]);
 	res.sendStatus(200);
 });
 
 // Export to CSV
-app.get('/admin/export-csv', async (req, res) => {
-	if (!req.session.admin) return res.redirect('/admin/login');
+app.get('/admin/export-csv', requireAdmin, async (req, res) => {
 	try {
 		const result = await pool.query('SELECT * FROM submissions ORDER BY created_at DESC');
 		let csv = 'Date,Name,Type,Email,Phone,Message,Volunteer Options,Highlighted,Deleted\n';
@@ -183,8 +191,7 @@ app.get('/admin/export-csv', async (req, res) => {
 	}
 });
 
-app.post('/admin/delete', async (req, res) => {
-	if (!req.session.admin) return res.redirect('/admin/login');
+app.post('/admin/delete', requireAdmin, async (req, res) => {
 	const { id } = req.body;
 	try {
 		await pool.query(`
@@ -201,20 +208,17 @@ app.post('/admin/delete', async (req, res) => {
 });
 
 app.get('/admin/logout', (req, res) => {
-	req.session.destroy();
-	res.redirect('/');
+	req.session.destroy(() => res.redirect('/'));
 });
 
 // ====================== INVITE SYSTEM ======================
 
 // Invite Page
-app.get('/admin/invite', (req, res) => {
-	if (!req.session.admin) return res.redirect('/admin/login');
+app.get('/admin/invite', requireAdmin, (req, res) => {
 	res.render('admin-invite', { success: false, error: false });
 });
 
-app.post('/admin/invite', async (req, res) => {
-	if (!req.session.admin) return res.redirect('/admin/login');
+app.post('/admin/invite', requireAdmin, async (req, res) => {
 	const { email, name } = req.body;
 	try {
 		const token = crypto.randomBytes(32).toString('hex');
@@ -293,6 +297,7 @@ app.post('/admin/signup', async (req, res) => {
 		// Auto login
 		req.session.admin = true;
 		req.session.adminEmail = email;
+		req.session.adminName = name || email;
 		res.redirect('/admin/dashboard');
 	} catch (e) {
 		console.error(e);

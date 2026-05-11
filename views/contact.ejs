@@ -6,8 +6,7 @@
     <div class="max-w-6xl mx-auto px-6 text-center">
         <h1 class="text-5xl font-bold text-navy mb-6">Get In Touch</h1>
         <p class="text-2xl text-gray-600 max-w-xl mx-auto">
-            Have questions? Want to volunteer? <br />
-			We’d love to hear from you.
+            Have questions or want to help? Reach out — we’d love to hear from you.
         </p>
     </div>
 </section>
@@ -16,61 +15,103 @@
 <section class="py-20 bg-white">
     <div class="max-w-2xl mx-auto px-6">
 		<% if (submitted) { %>
-			<div class="bg-green-100 border border-green-400 text-green-700 px-6 py-5 rounded-2xl mb-10 text-center text-lg">
+            <div class="bg-green-100 border border-green-400 text-green-700 px-8 py-6 rounded-3xl mb-12 text-center text-lg">
                 ✅ <strong>Thank you!</strong> Your message has been received.<br>
-                We'll get back to you soon.
+                We'll get back to you as soon as possible.
 			</div>
 		<% } else if (error) { %>
-            <div class="bg-red-100 border border-red-400 text-red-700 px-6 py-5 rounded-2xl mb-10 text-center">
-                ❌ Something went wrong. Please try again.
+            <div class="bg-red-100 border border-red-400 text-red-700 px-8 py-6 rounded-3xl mb-12 text-center">
+                ❌ Something went wrong. Please try again or email us directly.
 			</div>
 		<% } %>
 
         <form action="/contact" method="POST" class="space-y-8">
             <div class="grid md:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">First Name</label>
-                    <input type="text" name="firstName" required class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:outline-none focus:border-navy">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
+                    <input type="text" name="firstName" required
+                           class="w-full px-5 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:border-navy focus:ring-1">
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">Last Name</label>
-                    <input type="text" name="lastName" required class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:outline-none focus:border-navy">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Last Name <span class="text-red-500">*</span></label>
+                    <input type="text" name="lastName" required
+                           class="w-full px-5 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:border-navy focus:ring-1">
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                <input type="email" name="email" required class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:outline-none focus:border-navy">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Email Address <span class="text-red-500">*</span></label>
+                <input type="email" name="email" required
+                       class="w-full px-5 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:border-navy focus:ring-1">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">Phone (optional)</label>
-                <input type="tel" name="phone" class="w-full px-5 py-4 border border-gray-300 rounded-xl focus:outline-none focus:border-navy">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number (optional)</label>
+                <input type="tel" name="phone"
+                       class="w-full px-5 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:border-navy focus:ring-1">
             </div>
 
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Message / Comments</label>
-                <textarea name="message" rows="5" class="w-full px-5 py-4 border border-gray-300 rounded-2xl focus:outline-none focus:border-navy resize-y"></textarea>
+                <textarea name="message" rows="5"
+                          class="w-full px-5 py-4 border border-gray-300 rounded-3xl focus:outline-none focus:border-navy focus:ring-1 resize-y"
+                          placeholder="Tell us how you'd like to help or any questions you have...">
+				</textarea>
             </div>
 
             <!-- Volunteering Options -->
 			<div>
-                <label class="block text-sm font-medium text-gray-700 mb-3">Interested in Volunteering? (check all that apply)</label>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-                    <label class="flex items-center gap-2"><input type="checkbox" name="volunteerOptions" value="door_knocking"> Door Knocking / Neighborhood Walks</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="volunteerOptions" value="poll_worker"> Poll Worker / Election Day</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="volunteerOptions" value="phone_calls"> Phone Banking / Calling Voters</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="volunteerOptions" value="texting"> Texting Voters</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="volunteerOptions" value="signs"> Putting Up Signs</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="volunteerOptions" value="fundraising"> Fundraising / Donations</label>
-                    <label class="flex items-center gap-2"><input type="checkbox" name="volunteerOptions" value="other"> Other / Just Want to Help</label>
+                <label class="block text-sm font-medium text-gray-700 mb-4">
+                    I'm interested in volunteering (check all that apply)
+                </label>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-base">
+                    <label class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-2xl cursor-pointer">
+                        <input type="checkbox" name="volunteerOptions" value="door_knocking" class="w-5 h-5 accent-navy">
+                        <span>Door Knocking / Neighborhood Walks</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-2xl cursor-pointer">
+                        <input type="checkbox" name="volunteerOptions" value="poll_worker" class="w-5 h-5 accent-navy">
+                        <span>Poll Worker / Election Day Help</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-2xl cursor-pointer">
+                        <input type="checkbox" name="volunteerOptions" value="phone_calls" class="w-5 h-5 accent-navy">
+                        <span>Phone Banking / Calling Voters</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-2xl cursor-pointer">
+                        <input type="checkbox" name="volunteerOptions" value="texting" class="w-5 h-5 accent-navy">
+                        <span>Texting / Digital Outreach</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-2xl cursor-pointer">
+                        <input type="checkbox" name="volunteerOptions" value="signs" class="w-5 h-5 accent-navy">
+                        <span>Putting Up Campaign Signs</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-2xl cursor-pointer">
+                        <input type="checkbox" name="volunteerOptions" value="fundraising" class="w-5 h-5 accent-navy">
+                        <span>Fundraising / Donations</span>
+                    </label>
+                    <label class="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-2xl cursor-pointer col-span-full">
+                        <input type="checkbox" name="volunteerOptions" value="other" class="w-5 h-5 accent-navy">
+                        <span>Other / Just Want to Help</span>
+                    </label>
 				</div>
 			</div>
 
-            <button type="submit" class="w-full bg-navy hover:bg-accent text-white py-6 rounded-2xl text-xl font-semibold transition-all">
+            <button type="submit" class="w-full bg-navy hover:bg-accent text-white py-6 rounded-3xl text-xl font-semibold transition-all duration-300 mt-6">
                 Submit
             </button>
         </form>
+    </div>
+</section>
+
+<!-- CONTACT INFO -->
+<section class="py-16 bg-[color:var(--warm-white)]">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+        <p class="text-gray-600">You can also reach us directly at:</p>
+        <a href="mailto:marletteprecinct@gmail.com" 
+           class="text-navy hover:text-accent text-xl font-medium mt-3 inline-block"
+		>
+            marletteprecinct@gmail.com
+        </a>
     </div>
 </section>
 

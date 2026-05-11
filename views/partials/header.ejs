@@ -7,6 +7,7 @@
     <title>Marlette Precinct Republicans | The Team That Shows Up</title>
     <link rel="stylesheet" href="/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <meta name="description" content="Grassroots Republican team serving Marlette Precinct">
 </head>
 <body class="bg-[color:var(--warm-white)] text-gray-800 font-sans">
 
@@ -15,18 +16,16 @@
         <div class="max-w-6xl mx-auto px-6">
             <div class="flex justify-between items-center py-4">
                 
-                <!-- Logo / Name -->
-				<div class="flex items-center gap-3">
-					<a href="/" class="flex items-center gap-3 hover:opacity-90 transition">
-						<div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-bold text-xl">
-							🇺🇸
-						</div>
-						<div>
-							<span class="text-2xl font-bold tracking-tight">Marlette Precinct</span>
-							<p class="text-xs text-blue-200 -mt-1">Republicans</p>
-						</div>
-					</a>
-				</div>
+                <!-- Logo -->
+				<a href="/" class="flex items-center gap-3 hover:opacity-90 transition">
+					<div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-navy font-bold text-xl">
+						🇺🇸
+					</div>
+					<div>
+						<span class="text-2xl font-bold tracking-tight">Marlette Precinct</span>
+						<p class="text-xs text-blue-200 -mt-1">Republicans</p>
+					</div>
+				</a>
 
                 <!-- Desktop Menu -->
                 <div class="hidden md:flex items-center gap-8 text-sm font-medium">
@@ -34,22 +33,30 @@
                     <a href="/meet-the-team" class="hover:text-accent transition">Meet the Team</a>
                     <a href="/contact" class="hover:text-accent transition">Volunteer</a>
                     <a href="/contact" class="hover:text-accent transition">Contact</a>
+					<% if (typeof adminLoggedIn !== 'undefined' && adminLoggedIn) { %>
+                        <a href="/admin" class="bg-white text-navy px-5 py-2 rounded-xl text-sm font-semibold hover:bg-accent hover:text-white transition">
+							👤 Admin
+						</a>
+					<% } %>
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <button id="mobile-menu-btn" class="md:hidden text-2xl">
+                <button id="mobile-menu-btn" class="md:hidden text-3xl">
                     <i class="fa-solid fa-bars"></i>
                 </button>
             </div>
         </div>
 
-        <!-- Mobile Menu -->
-        <div id="mobile-menu" class="hidden md:hidden bg-navy border-t border-blue-800">
-            <div class="px-6 py-4 flex flex-col gap-4 text-sm">
-                <a href="/" class="hover:text-accent transition">Home</a>
-                <a href="/meet-the-team" class="hover:text-accent transition">Meet the Team</a>
-                <a href="/contact" class="hover:text-accent transition">Volunteer With Us</a>
-                <a href="/contact" class="hover:text-accent transition">Contact Us</a>
-            </div>
-        </div>
+		<!-- Mobile Menu -->
+		<div id="mobile-menu" class="hidden md:hidden bg-navy border-t border-blue-800 py-4">
+			<div class="px-6 flex flex-col gap-4 text-base">
+                <a href="/" class="hover:text-accent py-2">Home</a>
+                <a href="/meet-the-team" class="hover:text-accent py-2">Meet the Team</a>
+                <a href="/contact" class="hover:text-accent py-2">Volunteer</a>
+                <a href="/contact" class="hover:text-accent py-2">Contact</a>
+				<% if (typeof adminLoggedIn !== 'undefined' && adminLoggedIn) { %>
+                    <a href="/admin" class="bg-white text-navy py-3 text-center rounded-2xl font-semibold">Admin Dashboard</a>
+				<% } %>
+			</div>
+		</div>
     </nav>

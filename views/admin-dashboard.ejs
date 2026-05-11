@@ -2,80 +2,99 @@
 <%- include('partials/header') %>
 
 <section class="py-12 bg-[color:var(--warm-white)] min-h-screen">
-    <div class="max-w-7xl mx-auto px-6">
-        <div class="flex justify-between items-center mb-8">
-            <h1 class="text-4xl font-bold text-navy">Admin Dashboard</h1>
-            <div class="flex gap-4">
-                <a href="/admin/logout" class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl">Logout</a>
-            </div>
-        </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        
+        <!-- Header -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+			<div>
+				<h1 class="text-4xl font-bold text-navy">Admin Dashboard</h1>
+                <% if (typeof adminName !== 'undefined' && adminName) { %>
+                    <p class="text-gray-600">Welcome back, <%= adminName %>!</p>
+				<% } %>
+			</div>
+            <div class="flex flex-wrap gap-3">
+				<a href="/admin/invite" 
+                   class="bg-emerald-600 hover:bg-emerald-700 text-white px-6 py-3 rounded-2xl text-sm font-medium flex items-center gap-2"
+				>
+                    + Invite Admin
+				</a>
+				<a href="/admin/logout" 
+                   class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-2xl text-sm font-medium"
+				>
+					Logout
+				</a>
+			</div>
+		</div>
 
         <!-- Controls -->
-        <div class="flex justify-between items-center mb-6">
-            <div class="flex items-center gap-6">
-                <label class="flex items-center gap-2 cursor-pointer">
-                    <input type="checkbox" id="showDeleted" <%= showDeleted ? 'checked' : '' %> 
-                           onchange="toggleDeleted()">
-                    <span class="text-gray-700">View Deleted Entries</span>
-                </label>
-            </div>
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+            <label class="flex items-center gap-2 cursor-pointer text-sm">
+                <input type="checkbox" id="showDeleted" <%= showDeleted ? 'checked' : '' %> 
+                       onchange="toggleDeleted()" class="w-5 h-5 accent-navy">
+                <span>Show Deleted Entries</span>
+            </label>
             <button onclick="exportToCSV()" 
-                    class="bg-navy hover:bg-accent text-white px-6 py-3 rounded-xl flex items-center gap-2">
+				class="bg-navy hover:bg-accent text-white px-6 py-3 rounded-xl flex items-center gap-2"
+			>
                 📥 Export to CSV
             </button>
         </div>
 
+        <!-- Table -->
         <div class="bg-white rounded-3xl shadow overflow-hidden">
-            <table class="w-full">
-                <thead class="bg-navy text-white">
-                    <tr>
-                        <th class="px-6 py-4 text-left">Date</th>
-                        <th class="px-6 py-4 text-left">Name</th>
-                        <th class="px-6 py-4 text-left">Type</th>
-                        <th class="px-6 py-4 text-left">Email</th>
-                        <th class="px-6 py-4 text-left">Volunteer Interests</th>
-                        <th class="px-6 py-4 text-center">Highlight</th>
-                        <th class="px-6 py-4 text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y">
-                    <% submissions.forEach(sub => { %>
-                    <tr class="hover:bg-gray-50 <%= sub.deleted_at ? 'opacity-60 line-through' : '' %>">
-                        <td class="px-6 py-4"><%= new Date(sub.created_at).toLocaleDateString() %></td>
-                        <td class="px-6 py-4 font-medium"><%= sub.first_name %> <%= sub.last_name %></td>
-                        <td class="px-6 py-4">
-                            <span class="px-3 py-1 rounded-full text-xs <%= sub.type === 'volunteer' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' %>">
-                                <%= sub.type %>
-                            </span>
-                        </td>
-                        <td class="px-6 py-4"><%= sub.email %></td>
-                        <td class="px-6 py-4 text-sm">
-                            <%= sub.volunteer_options && sub.volunteer_options.length ? sub.volunteer_options.join(', ') : '-' %>
-                        </td>
-						<td class="px-6 py-4 text-center">
-							<button 
-								data-id="<%= sub.id %>"
-								data-highlighted="<%= sub.highlighted %>"
-								onclick="toggleHighlight(this)"
-								class="text-3xl transition hover:scale-110 <%= sub.highlighted ? 'text-yellow-500' : 'text-gray-300' %>">
-								<%= sub.highlighted ? '★' : '☆' %>
-							</button>
-						</td>
-                        <td class="px-6 py-4 text-center">
-                            <% if (!sub.deleted_at) { %>
-							<form action="/admin/delete" method="POST" style="display: inline;">
-								<input type="hidden" name="id" value="<%= sub.id %>">
-                                    <button type="submit" onclick="return confirm('Delete this submission?')" 
-                                            class="text-red-600 hover:text-red-800 font-medium">Delete</button>
-							</form>
-                            <% } else { %>
-                                <span class="text-gray-400 text-sm">Deleted</span>
-                            <% } %>
-						</td>
-                    </tr>
-                    <% }) %>
-                </tbody>
-            </table>
+            <div class="overflow-x-auto">
+                <table class="w-full min-w-full">
+					<thead class="bg-navy text-white">
+						<tr>
+							<th class="px-4 py-4 text-left">Date</th>
+							<th class="px-4 py-4 text-left">Name</th>
+							<th class="px-4 py-4 text-left">Type</th>
+							<th class="px-4 py-4 text-left hidden sm:table-cell">Email</th>
+							<th class="px-4 py-4 text-left">Interests</th>
+							<th class="px-4 py-4 text-center">Flag</th>
+							<th class="px-4 py-4 text-center">Actions</th>
+						</tr>
+					</thead>
+					<tbody class="divide-y divide-gray-100">
+						<% submissions.forEach(sub => { %>
+							<tr class="hover:bg-gray-50 <%= sub.deleted_at ? 'opacity-60 line-through' : '' %>">
+								<td class="px-4 py-4 text-sm"><%= new Date(sub.created_at).toLocaleDateString() %></td>
+								<td class="px-4 py-4 font-medium"><%= sub.first_name %> <%= sub.last_name %></td>
+								<td class="px-4 py-4">
+									<span class="px-3 py-1 rounded-full text-xs <%= sub.type === 'volunteer' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' %>">
+										<%= sub.type %>
+									</span>
+								</td>
+								<td class="px-4 py-4 text-sm hidden sm:table-cell break-all"><%= sub.email %></td>
+								<td class="px-4 py-4 text-sm">
+									<%= sub.volunteer_options && sub.volunteer_options.length ? sub.volunteer_options.join(', ') : '—' %>
+								</td>
+								<td class="px-4 py-4 text-center">
+									<button 
+										data-id="<%= sub.id %>"
+										data-highlighted="<%= sub.highlighted %>"
+										onclick="toggleHighlight(this)"
+										class="text-3xl transition hover:scale-110 <%= sub.highlighted ? 'text-yellow-500' : 'text-gray-300' %>"
+									>
+										<%= sub.highlighted ? '★' : '☆' %>
+									</button>
+								</td>
+								<td class="px-4 py-4 text-center">
+									<% if (!sub.deleted_at) { %>
+									<form action="/admin/delete" method="POST" style="display: inline;">
+										<input type="hidden" name="id" value="<%= sub.id %>">
+											<button type="submit" onclick="return confirm('Delete this?')" 
+													class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</button>
+									</form>
+									<% } else { %>
+										<span class="text-xs text-gray-400">Deleted</span>
+									<% } %>
+								</td>
+							</tr>
+						<% }) %>
+					</tbody>
+				</table>
+            </div>
         </div>
     </div>
 </section>
@@ -92,10 +111,13 @@ function toggleHighlight(btn) {
     fetch('/admin/highlight', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: parseInt(id), highlighted: newState })
+        body: JSON.stringify({ 
+            id: parseInt(id), 
+            highlighted: newState 
+        })
     }).then(() => {
         location.reload();
-    });
+    }).catch(err => console.error(err));
 }
 
 function exportToCSV() {
