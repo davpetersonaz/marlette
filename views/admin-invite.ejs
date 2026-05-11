@@ -1,0 +1,34 @@
+<!-- /views/admin-invite.ejs -->
+<%- include('partials/header') %>
+
+<section class="py-20 bg-[color:var(--warm-white)]">
+    <div class="max-w-lg mx-auto px-6">
+        <h1 class="text-4xl font-bold text-navy text-center mb-10">Invite New Admin</h1>
+
+        <% if (success) { %>
+            <div class="bg-green-100 p-6 rounded-2xl text-center mb-8">
+                ✅ Invite sent successfully!
+            </div>
+        <% } else if (error) { %>
+            <div class="bg-red-100 p-6 rounded-2xl text-center mb-8">
+                ❌ Failed to send invite. Try again.
+            </div>
+        <% } %>
+
+        <form action="/admin/invite" method="POST" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium mb-2">Full Name (optional)</label>
+                <input type="text" name="name" class="w-full px-5 py-4 border border-gray-300 rounded-2xl">
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-2">Email Address</label>
+                <input type="email" name="email" required class="w-full px-5 py-4 border border-gray-300 rounded-2xl">
+            </div>
+            <button type="submit" class="w-full bg-navy hover:bg-accent text-white py-5 rounded-2xl text-lg">
+                Send Invite Link
+            </button>
+        </form>
+    </div>
+</section>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,31 @@
+<!-- /views/admin-signup.ejs -->
+<%- include('partials/header') %>
+
+<section class="min-h-screen bg-[color:var(--warm-white)] flex items-center justify-center py-20">
+    <div class="max-w-md w-full mx-auto px-6">
+        <div class="bg-white rounded-3xl shadow-xl p-10">
+            <h1 class="text-3xl font-bold text-navy text-center mb-8">Set Your Admin Password</h1>
+            <p class="text-center text-gray-600 mb-8">for <strong><%= email %></strong></p>
+
+            <form action="/admin/signup" method="POST" class="space-y-6">
+                <input type="hidden" name="email" value="<%= email %>">
+                <input type="hidden" name="token" value="<%= token %>">
+
+                <div>
+                    <label class="block text-sm font-medium mb-2">Display Name</label>
+                    <input type="text" name="name" class="w-full px-5 py-4 border border-gray-300 rounded-2xl">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Password</label>
+                    <input type="password" name="password" required minlength="8" 
+                           class="w-full px-5 py-4 border border-gray-300 rounded-2xl">
+                </div>
+                <button type="submit" class="w-full bg-navy hover:bg-accent text-white py-5 rounded-2xl text-lg font-semibold">
+                    Create Account & Login
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>
