@@ -118,16 +118,21 @@ app.post('/admin/login', async (req, res) => {
 });
 
 app.get('/admin/dashboard', async (req, res) => {
-	if (!req.session.admin) return res.redirect('/admin/login');
+	if (!req.session.admin) {
+		return res.redirect('/admin/login');
+	}
+
 	try {
 		const result = await pool.query(`
 			SELECT * FROM submissions 
 			WHERE deleted_at IS NULL 
 			ORDER BY created_at DESC
 		`);
-		res.render('admin-dashboard', { submissions: result.rows });
+		res.render('admin-dashboard', { 
+			submissions: result.rows 
+		});
 	} catch (e) {
-		console.error(e);
+		console.error('Dashboard error:', e);
 		res.send('Database error: ' + e.message);
 	}
 });

@@ -1,3 +1,4 @@
+<!-- /views/admin-login.ejs -->
 <%- include('partials/header') %>
 
 <section class="py-12 bg-[color:var(--warm-white)] min-h-screen">
@@ -26,7 +27,7 @@
                 <tbody class="divide-y">
                     <% submissions.forEach(sub => { %>
 						<tr class="hover:bg-gray-50">
-							<td class="px-6 py-4"><%= sub.created_at.toLocaleDateString() %></td>
+							<td class="px-6 py-4"><%= sub.created_at ? new Date(sub.created_at).toLocaleDateString() : 'N/A' %></td>
 							<td class="px-6 py-4 font-medium"><%= sub.first_name %> <%= sub.last_name %></td>
 							<td class="px-6 py-4">
 								<span class="px-3 py-1 rounded-full text-xs <%= sub.type === 'volunteer' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' %>">
