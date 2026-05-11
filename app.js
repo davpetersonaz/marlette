@@ -92,6 +92,55 @@ app.post('/contact', async (req, res) => {
 	}
 });
 
+// ADMIN ROUTES
+app.get('/admin', (req, res) => {
+	if (req.session.admin) {
+		res.redirect('/admin/dashboard');
+	} else {
+		res.redirect('/admin/login');
+	}
+});
+
+app.get('/admin/login', (req, res) => {
+	res.render('admin-login', { error: false });
+});
+
+app.post('/admin/login', async (req, res) => {
+	const { username, password } = req.body;
+	
+	// Simple hardcoded admin for now (we'll improve later)
+	if (username === 'admin' && password === 'marlette2026') {
+		req.session.admin = true;
+		res.redirect('/admin/dashboard');
+	} else {
+		res.render('admin-login', { error: true });
+	}
+});
+
+app.get('/admin/dashboard', async (req, res) => {
+	if (!req.session.admin) return res.redirect('/admin/login');
+
+	try {
+		const result = await pool.query(`
+			SELECT * FROM submissions 
+			WHERE deleted_at IS NULL 
+			ORDER BY created_at DESC
+		`);
+		
+		res.send(`
+			<h1>Admin Dashboard</h1>
+			<p><a href="/admin/logout">Logout</a></p>
+			<pre>${JSON.stringify(result.rows, null, 2)}</pre>
+		`);
+	} catch (e) {
+		res.send('Database error');
+	}
+});
+
+app.get('/admin/logout', (req, res) => {
+	req.session.destroy();
+	res.redirect('/');
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`🚀 Server running on http://localhost:${PORT}`));
