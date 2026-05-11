@@ -112,12 +112,28 @@ app.get('/admin/login', (req, res) => {
 
 app.post('/admin/login', async (req, res) => {
 	const { username, password } = req.body;
-	
-	// Simple hardcoded admin for now (we'll improve later)
-	if (username === 'admin' && password === 'marlette2026') {
-		req.session.admin = true;
-		res.redirect('/admin/dashboard');
-	} else {
+	try {
+		// Try email or name
+		const result = await pool.query(
+			'SELECT * FROM admins WHERE (email = $1 OR name = $1) AND active = true',
+			[username]
+		);
+		if (result.rows.length === 0) {
+			return res.render('admin-login', { error: true });
+		}
+
+		const admin = result.rows[0];
+		const match = await bcrypt.compare(password, admin.password_hash);
+		if (match) {
+			req.session.admin = true;
+			req.session.adminEmail = admin.email;
+			req.session.adminName = admin.name;
+			return res.redirect('/admin/dashboard');
+		} else {
+			return res.render('admin-login', { error: true });
+		}
+	} catch (e) {
+		console.error(e);
 		res.render('admin-login', { error: true });
 	}
 });
