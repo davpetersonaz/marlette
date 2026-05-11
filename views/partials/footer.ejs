@@ -1,0 +1,65 @@
+    <!-- FOOTER -->
+    <footer class="bg-navy text-white py-12 mt-16">
+        <div class="max-w-6xl mx-auto px-6">
+            <div class="grid md:grid-cols-3 gap-10">
+                
+                <!-- Column 1 -->
+                <div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center text-navy">🇺🇸</div>
+                        <span class="text-xl font-bold">Marlette Precinct Republicans</span>
+                    </div>
+                    <p class="text-blue-200 text-sm">
+                        Real grassroots Republicans serving our community through action, not just titles.
+                    </p>
+                </div>
+
+                <!-- Column 2 -->
+                <div>
+                    <h4 class="font-semibold mb-4">Quick Links</h4>
+                    <div class="space-y-2 text-sm">
+                        <a href="/" class="block hover:text-accent transition">Home</a>
+                        <a href="/meet-the-team" class="block hover:text-accent transition">Meet the Team</a>
+                        <a href="/contact" class="block hover:text-accent transition">Volunteer</a>
+                    </div>
+                </div>
+
+                <!-- Column 3 -->
+                <div>
+                    <h4 class="font-semibold mb-4">Get Involved</h4>
+                    <p class="text-sm text-blue-200 mb-4">
+                        Have questions or want to help?<br>
+                        Reach out today.
+                    </p>
+                    <a href="/contact" 
+                       class="inline-block bg-accent hover:bg-red-700 text-white px-6 py-3 rounded-lg font-medium transition">
+                        Contact Us
+                    </a>
+                </div>
+            </div>
+
+            <div class="border-t border-blue-800 mt-10 pt-8 text-center text-xs text-blue-300">
+                <p>&copy; <%= new Date().getFullYear() %> Marlette Precinct Republican Team. All Rights Reserved.</p>
+                <p class="mt-1">Paid for by the Marlette Precinct Republican Committee.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Simple mobile menu toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+            const icon = btn.querySelector('i');
+            if (icon.classList.contains('fa-bars')) {
+                icon.classList.remove('fa-bars');
+                icon.classList.add('fa-xmark');
+            } else {
+                icon.classList.add('fa-bars');
+                icon.classList.remove('fa-xmark');
+            }
+        });
+    </script>
+</body>
+</html>
