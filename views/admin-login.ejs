@@ -1,0 +1,58 @@
+<%- include('partials/header') %>
+
+<section class="py-12 bg-[color:var(--warm-white)] min-h-screen">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="flex justify-between items-center mb-10">
+            <h1 class="text-4xl font-bold text-navy">Admin Dashboard</h1>
+                <div>
+                <a href="/admin/logout" 
+                   class="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-xl">
+                    Logout
+                </a>
+			</div>
+		</div>
+        <div class="bg-white rounded-3xl shadow overflow-hidden">
+            <table class="w-full">
+                <thead class="bg-navy text-white">
+                    <tr>
+                        <th class="px-6 py-4 text-left">Date</th>
+                        <th class="px-6 py-4 text-left">Name</th>
+                        <th class="px-6 py-4 text-left">Type</th>
+                        <th class="px-6 py-4 text-left">Email</th>
+                        <th class="px-6 py-4 text-left">Volunteer Interests</th>
+                        <th class="px-6 py-4 text-center">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y">
+                    <% submissions.forEach(sub => { %>
+						<tr class="hover:bg-gray-50">
+							<td class="px-6 py-4"><%= sub.created_at.toLocaleDateString() %></td>
+							<td class="px-6 py-4 font-medium"><%= sub.first_name %> <%= sub.last_name %></td>
+							<td class="px-6 py-4">
+								<span class="px-3 py-1 rounded-full text-xs <%= sub.type === 'volunteer' ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700' %>">
+									<%= sub.type %>
+								</span>
+							</td>
+							<td class="px-6 py-4"><%= sub.email %></td>
+							<td class="px-6 py-4 text-sm">
+								<%= sub.volunteer_options && sub.volunteer_options.length ? sub.volunteer_options.join(', ') : '-' %>
+							</td>
+							<td class="px-6 py-4 text-center">
+								<form action="/admin/delete" method="POST" style="display: inline;">
+									<input type="hidden" name="id" value="<%= sub.id %>">
+									<button type="submit" 
+											onclick="return confirm('Delete this submission?')"
+											class="text-red-600 hover:text-red-800 font-medium">
+										Delete
+									</button>
+								</form>
+							</td>
+						</tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+
+<%- include('partials/footer') %>

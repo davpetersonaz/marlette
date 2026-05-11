@@ -119,21 +119,33 @@ app.post('/admin/login', async (req, res) => {
 
 app.get('/admin/dashboard', async (req, res) => {
 	if (!req.session.admin) return res.redirect('/admin/login');
-
 	try {
 		const result = await pool.query(`
 			SELECT * FROM submissions 
 			WHERE deleted_at IS NULL 
 			ORDER BY created_at DESC
 		`);
-		
-		res.send(`
-			<h1>Admin Dashboard</h1>
-			<p><a href="/admin/logout">Logout</a></p>
-			<pre>${JSON.stringify(result.rows, null, 2)}</pre>
-		`);
+		res.render('admin-dashboard', { submissions: result.rows });
 	} catch (e) {
-		res.send('Database error');
+		console.error(e);
+		res.send('Database error: ' + e.message);
+	}
+});
+
+app.post('/admin/delete', async (req, res) => {
+	if (!req.session.admin) return res.redirect('/admin/login');
+	const { id } = req.body;
+	try {
+		await pool.query(`
+			UPDATE submissions 
+			SET deleted_at = CURRENT_TIMESTAMP, 
+				deleted_by = 'admin'
+			WHERE id = $1
+		`, [id]);
+		res.redirect('/admin/dashboard');
+	} catch (e) {
+		console.error(e);
+		res.send('Delete failed');
 	}
 });
 
