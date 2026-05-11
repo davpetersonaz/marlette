@@ -6,7 +6,8 @@
 	"scripts": {
 		"start": "node app.js",
 		"dev": "concurrently \"nodemon app.js\" \"tailwindcss -i ./public/css/input.css -o ./public/css/style.css --watch\"",
-		"build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/style.css"
+		"build:css": "tailwindcss -i ./public/css/input.css -o ./public/css/style.css",
+		"build": "npm run build:css"
 	},
 	"keywords": [],
 	"author": "",
