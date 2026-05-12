@@ -14,7 +14,7 @@
 <!-- TEAM GRID -->
 <section class="py-20 bg-white">
     <div class="max-w-6xl mx-auto px-6">
-        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-14">
+        <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-14 mb-8">
 
             <!-- Team Member 1 -->
             <div class="text-center group">
@@ -23,10 +23,19 @@
                 </div>
                 <h3 class="text-2xl font-semibold text-navy mb-1">Dina</h3>
                 <p class="text-accent font-medium mb-6">Precinct Committeeman Candidate</p>
-                <p class="text-gray-600 px-4 leading-relaxed">
-                    Longtime Marlette resident with years of experience door-knocking, registering voters, and supporting conservative candidates.
-                </p>
-            </div>
+
+				<div class="px-4 text-gray-600 leading-relaxed text-left max-w-xs mx-auto expandable-bio">
+					<p class="short-bio"></p>
+					<div class="full-bio hidden mt-3">
+                    	Longtime Marlette resident with years of experience door-knocking, registering voters, and supporting conservative candidates.
+					</div>
+					<button onclick="toggleBio(this)" 
+						class="text-navy hover:text-accent text-sm font-medium mt-4 flex items-center gap-1 mx-auto"
+					>
+						Read more ↓
+					</button>
+				</div>
+			</div>
 
             <!-- Team Member 2 -->
             <div class="text-center group">
@@ -35,28 +44,47 @@
                 </div>
                 <h3 class="text-2xl font-semibold text-navy mb-1">Volunteer</h3>
                 <p class="text-accent font-medium mb-6">Volunteer Coordinator</p>
-                <p class="text-gray-600 px-4 leading-relaxed">
-                    Dedicated conservative activist focused on building strong community networks and election day operations.
-                </p>
-            </div>
 
-            <!-- Team Member 3 - Forrest -->
-            <div class="text-center group">
-                <div class="mx-auto w-60 h-60 rounded-full overflow-hidden border-8 border-white shadow-2xl mb-8 transition-transform duration-500 group-hover:scale-105">
-                    <img src="/images/vol3-forrest.jpg" alt="Forrest" class="w-full h-full object-cover">
-                </div>
-                <h3 class="text-2xl font-semibold text-navy mb-1">Forrest</h3>
-			    <p class="text-accent font-medium mb-6">Grassroots Organizer & Former LD 26 Chairman</p>
-                <p class="text-gray-600 px-4 leading-relaxed">
-					Forrest has lived in Marlette Precinct for 37 years with his wife Lisa. They have 4 adult children and one grandchild. 
-					He retired in 2021 after a long career as an Environmental Scientist, most recently at the Palo Verde Nuclear Generating Station.
-				</p>
-				<p class="text-gray-600 px-4 leading-relaxed mt-4">
-					He served as a Precinct Committeeman from 2022–2024 and as Chairman of Legislative District 26. 
-					For the past two years, Forrest has provided leadership, mentoring, and voter data expertise while working closely with this team 
-					to elect Republican candidates and build a strong grassroots operation.
-                </p>
-            </div>
+				<div class="px-4 text-gray-600 leading-relaxed text-left max-w-xs mx-auto expandable-bio">
+					<p class="short-bio"></p>
+					<div class="full-bio hidden mt-3">
+                    	Dedicated conservative activist focused on building strong community networks and election day operations.
+					</div>
+					<button onclick="toggleBio(this)" 
+						class="text-navy hover:text-accent text-sm font-medium mt-4 flex items-center gap-1 mx-auto"
+					>
+						Read more ↓
+					</button>
+				</div>
+			</div>
+
+			<!-- Team Member 3 - Forrest -->
+			<div class="text-center group">
+				<div class="mx-auto w-60 h-60 rounded-full overflow-hidden border-8 border-white shadow-2xl mb-8 transition-transform duration-500 group-hover:scale-105">
+					<img src="/images/vol3-forrest.jpg" alt="Forrest" class="w-full h-full object-cover">
+				</div>
+				<h3 class="text-2xl font-semibold text-navy mb-1">Forrest</h3>
+				<p class="text-accent font-medium mb-6">Grassroots Organizer & Former LD 26 Chairman</p>
+				
+				<div class="px-4 text-gray-600 leading-relaxed text-left max-w-xs mx-auto expandable-bio">
+					<p class="short-bio"></p>
+					<div class="full-bio hidden mt-3">
+						Forrest has lived in Marlette Precinct for 37 years with his wife Lisa. 
+						They have 4 adult children and one grandchild. 
+						He retired in 2021 after a long career as an Environmental Scientist, 
+						most recently at the Palo Verde Nuclear Generating Station.
+						He served as a Precinct Committeeman from 2022–2024 and as Chairman of Legislative District 26. 
+						For the past two years, Forrest has provided leadership, mentoring, 
+						and voter data expertise while working closely with this team to 
+						elect Republican candidates and build a strong grassroots operation.
+					</div>
+					<button onclick="toggleBio(this)" 
+						class="text-navy hover:text-accent text-sm font-medium mt-4 flex items-center gap-1 mx-auto"
+					>
+						Read more ↓
+					</button>
+				</div>
+			</div>
 
             <!-- Team Member 4 -->
             <div class="text-center group">
@@ -65,10 +93,19 @@
                 </div>
                 <h3 class="text-2xl font-semibold text-navy mb-1">Volunteer</h3>
                 <p class="text-accent font-medium mb-6">Grassroots Organizer</p>
-                <p class="text-gray-600 px-4 leading-relaxed">
-                    Passionate about petition drives, campaign sign installation, and getting conservatives to the polls.
-                </p>
-            </div>
+
+				<div class="px-4 text-gray-600 leading-relaxed text-left max-w-xs mx-auto expandable-bio">
+					<p class="short-bio"></p>
+					<div class="full-bio hidden mt-3">
+	                    Passionate about petition drives, campaign sign installation, and getting conservatives to the polls.
+					</div>
+					<button onclick="toggleBio(this)" 
+						class="text-navy hover:text-accent text-sm font-medium mt-4 flex items-center gap-1 mx-auto"
+					>
+						Read more ↓
+					</button>
+				</div>
+			</div>
 
         </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-14">
@@ -80,10 +117,19 @@
                 </div>
                 <h3 class="text-2xl font-semibold text-navy mb-1">Ricky</h3>
                 <p class="text-accent font-medium mb-6">Precinct Committeeman Candidate</p>
-                <p class="text-gray-600 px-4 leading-relaxed">
-                    Longtime Marlette resident with years of experience door-knocking and supporting conservative candidates.
-                </p>
-            </div>
+
+				<div class="px-4 text-gray-600 leading-relaxed text-left max-w-xs mx-auto expandable-bio">
+					<p class="short-bio"></p>
+					<div class="full-bio hidden mt-3">
+	                    Longtime Marlette resident with years of experience door-knocking and supporting conservative candidates.
+					</div>
+					<button onclick="toggleBio(this)" 
+						class="text-navy hover:text-accent text-sm font-medium mt-4 flex items-center gap-1 mx-auto"
+					>
+						Read more ↓
+					</button>
+				</div>
+			</div>
 
             <!-- Team Member 6 -->
             <div class="text-center group">
@@ -92,10 +138,19 @@
                 </div>
                 <h3 class="text-2xl font-semibold text-navy mb-1">Volunteer</h3>
                 <p class="text-accent font-medium mb-6">Volunteer Coordinator</p>
-                <p class="text-gray-600 px-4 leading-relaxed">
-                    Dedicated conservative activist focused on building strong community networks and running smooth election day operations.
-                </p>
-            </div>
+
+				<div class="px-4 text-gray-600 leading-relaxed text-left max-w-xs mx-auto expandable-bio">
+					<p class="short-bio"></p>
+					<div class="full-bio hidden mt-3">
+	                    Dedicated conservative activist focused on building strong community networks and running smooth election day operations.
+					</div>
+					<button onclick="toggleBio(this)" 
+						class="text-navy hover:text-accent text-sm font-medium mt-4 flex items-center gap-1 mx-auto"
+					>
+						Read more ↓
+					</button>
+				</div>
+			</div>
 
             <!-- Team Member 7 -->
             <div class="text-center group">
@@ -104,10 +159,19 @@
                 </div>
                 <h3 class="text-2xl font-semibold text-navy mb-1">Volunteer</h3>
                 <p class="text-accent font-medium mb-6">Grassroots Organizer</p>
-                <p class="text-gray-600 px-4 leading-relaxed">
-                    Passionate about petition drives, campaign sign installation, and getting conservatives to the polls.
-                </p>
-            </div>
+
+				<div class="px-4 text-gray-600 leading-relaxed text-left max-w-xs mx-auto expandable-bio">
+					<p class="short-bio"></p>
+					<div class="full-bio hidden mt-3">
+	                    Passionate about petition drives, campaign sign installation, and getting conservatives to the polls.
+					</div>
+					<button onclick="toggleBio(this)" 
+						class="text-navy hover:text-accent text-sm font-medium mt-4 flex items-center gap-1 mx-auto"
+					>
+						Read more ↓
+					</button>
+				</div>
+			</div>
 
         </div>
     </div>
@@ -223,5 +287,37 @@
         </div>
     </div>
 </section>
+
+<script>
+function toggleBio(btn) {
+    const container = btn.closest('.expandable-bio');
+    const short = container.querySelector('.short-bio');
+    const full = container.querySelector('.full-bio');
+    if (full.classList.contains('hidden')) {
+        short.classList.add('hidden');
+        full.classList.remove('hidden');
+        btn.innerHTML = 'Read less ↑';
+    } else {
+        short.classList.remove('hidden');
+        full.classList.add('hidden');
+        btn.innerHTML = 'Read more ↓';
+    }
+}
+
+// Auto-truncate all bios on page load
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.expandable-bio').forEach(container => {
+        const fullTextEl = container.querySelector('.full-bio');
+        const shortEl = container.querySelector('.short-bio');
+        if (fullTextEl && shortEl) {
+            const fullText = fullTextEl.innerText.trim();
+            const truncated = fullText.length > 135 
+                ? fullText.substring(0, 135).trim() + '...' 
+                : fullText;
+            shortEl.textContent = truncated;
+        }
+    });
+});
+</script>
 
 <%- include('partials/footer') %>
