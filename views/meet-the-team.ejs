@@ -304,17 +304,24 @@ function toggleBio(btn) {
     }
 }
 
-// Auto-truncate all bios on page load
+// Auto-truncate and hide button if short
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.expandable-bio').forEach(container => {
         const fullTextEl = container.querySelector('.full-bio');
         const shortEl = container.querySelector('.short-bio');
-        if (fullTextEl && shortEl) {
+        const button = container.querySelector('button');
+        if (fullTextEl && shortEl && button) {
             const fullText = fullTextEl.innerText.trim();
+            // Truncate to ~135 characters
             const truncated = fullText.length > 135 
                 ? fullText.substring(0, 135).trim() + '...' 
                 : fullText;
             shortEl.textContent = truncated;
+            // Hide "Read more" if text is short
+            if (fullText.length < 140) {
+                button.style.display = 'none';
+                shortEl.classList.remove('line-clamp-4'); // show full if very short
+            }
         }
     });
 });
