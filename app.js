@@ -31,6 +31,17 @@ app.use(session({
 	cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 } // 7 days
 }));
 
+// Pass current page name to all templates
+app.use((req, res, next) => {
+	let pageName = 'home';
+	if (req.path === '/meet-the-team'){ pageName = 'meet_the_team'; }
+	else if (req.path === '/contact'){ pageName = 'contact'; }
+	else if (req.path.startsWith('/admin')){ pageName = 'admin'; }
+	else if (req.path === '/'){ pageName = 'home'; }
+	res.locals.pageName = pageName;
+	next();
+});
+
 // Helper to pass admin status to all views
 app.use((req, res, next) => {
 	res.locals.adminLoggedIn = !!req.session.admin;

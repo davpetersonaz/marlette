@@ -13,13 +13,66 @@
 		function gtag(){dataLayer.push(arguments);}
 		gtag('js', new Date());
 		gtag('config', 'G-HQC54WX49E');
+
+		function trackEvent(eventName, parameters = {}) {
+			if (typeof gtag !== 'undefined') {
+				gtag('event', eventName, parameters);
+			}
+		}
+
+		document.addEventListener('DOMContentLoaded', function() {
+			const pageName = document.body.getAttribute('data-page-name') || 'home';
+
+			// Track all navigation links
+			document.addEventListener('click', function(e) {
+				const link = e.target.closest('a[href]');
+				if (link) {
+					trackEvent('nav_click', {
+						link_text: (link.textContent || '').trim(),
+						page_name: pageName,
+						page_path: window.location.pathname
+					});
+				}
+			});
+
+			// Contact Form
+			const contactForm = document.querySelector('form[action="/contact"]');
+			if (contactForm) {
+				contactForm.addEventListener('submit', function() {
+					trackEvent('form_submit', {
+						form_id: 'contact_form',
+						page_name: pageName
+					});
+				});
+			}
+
+		    // Admin Login Attempts
+			const loginForm = document.querySelector('form[action="/admin/login"]');
+			if (loginForm) {
+				loginForm.addEventListener('submit', function() {
+					trackEvent('admin_login_attempt', { 
+					  page_name: pageName 
+					});
+				});
+			}
+
+		    // Accomplishment Image Clicks
+			document.querySelectorAll('.accomplishment-img').forEach(img => {
+				img.addEventListener('click', () => {
+					trackEvent('image_click', { 
+						image_name: img.alt || 'accomplishment_image',
+						page_name: pageName
+					});
+				});
+			});			
+		});
 	</script>
 
 	<link rel="stylesheet" href="/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <meta name="description" content="Grassroots Republican team serving Marlette Precinct">
 </head>
-<body class="bg-[color:var(--warm-white)] text-gray-800 font-sans">
+<body data-page-name="<%= pageName || 'home' %>" class="bg-[color:var(--warm-white)] text-gray-800 font-sans">
 
     <!-- NAVBAR -->
     <nav class="bg-navy text-white sticky top-0 z-50 shadow-md">
