@@ -116,12 +116,20 @@
                     <img src="/images/vol5-ricky.jpg" alt="Ricky" class="w-full h-full object-cover">
                 </div>
                 <h3 class="text-2xl font-semibold text-navy mb-1">Ricky</h3>
-                <p class="text-accent font-medium mb-6">Precinct Committeeman Candidate</p>
+                <p class="text-accent font-medium mb-6">Precinct Committeeman & Voter Outreach Leader</p>
 
 				<div class="px-4 text-gray-600 leading-relaxed text-left max-w-xs mx-auto expandable-bio">
 					<p class="short-bio"></p>
 					<div class="full-bio hidden mt-3">
-	                    Longtime Marlette resident with years of experience door-knocking and supporting conservative candidates.
+	                    He lives on 11th Avenue in Marlette Precinct with his wife and two boys. 
+						A 34-year resident of Marlette, he is grateful to have his parents and brother 
+						living on the same street and attending Living Streams Church together.
+						With a background in finance and accounting, he holds a bachelor’s degree from 
+						Arizona State University and two master’s degrees from Grand Canyon University. 
+						He currently works in HR Compensation, focusing on budget analysis and labor data.
+						He has served as a Precinct Committeeman since 2023, actively registering voters and working to increase Republican turnout. 
+						He is also involved with Turning Point Action, volunteering at various events and helping chase ballots. 
+						He considers it a privilege to serve the community and hopes to continue doing so.
 					</div>
 					<button onclick="toggleBio(this)" 
 						class="text-navy hover:text-accent text-sm font-medium mt-4 flex items-center gap-1 mx-auto"
@@ -312,13 +320,13 @@ document.addEventListener('DOMContentLoaded', () => {
         const button = container.querySelector('button');
         if (fullTextEl && shortEl && button) {
             const fullText = fullTextEl.innerText.trim();
-            // Truncate to ~135 characters
-            const truncated = fullText.length > 135 
-                ? fullText.substring(0, 135).trim() + '...' 
+            // Truncate to ~195 characters
+            const truncated = fullText.length > 195 
+                ? fullText.substring(0, 195).trim() + '...' 
                 : fullText;
             shortEl.textContent = truncated;
             // Hide "Read more" if text is short
-            if (fullText.length < 140) {
+            if (fullText.length < 200) {
                 button.style.display = 'none';
                 shortEl.classList.remove('line-clamp-4'); // show full if very short
             }
