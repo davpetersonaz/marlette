@@ -33,19 +33,20 @@ app.use(session({
 
 // Pass current page name to all templates
 app.use((req, res, next) => {
-	let pageName = 'home';
-	if (req.path === '/meet-the-team'){ pageName = 'meet_the_team'; }
-	else if (req.path === '/contact'){ pageName = 'contact'; }
-	else if (req.path.startsWith('/admin')){ pageName = 'admin'; }
-	else if (req.path === '/'){ pageName = 'home'; }
-	res.locals.pageName = pageName;
-	next();
-});
-
-// Helper to pass admin status to all views
-app.use((req, res, next) => {
+	// Admin status
 	res.locals.adminLoggedIn = !!req.session.admin;
 	res.locals.adminName = req.session.adminName || null;
+
+	// Page name
+	let pageName = 'home';
+	if (req.path === '/meet-the-team'){ pageName = 'meet_the_team'; }
+	else if (req.path === '/accomplishments'){ pageName = 'accomplishments'; }
+	else if (req.path === '/whats-a-pc'){ pageName = 'whats-a-pc'; }
+	else if (req.path === '/volunteer'){ pageName = 'volunteer'; }
+	else if (req.path === '/contact'){ pageName = 'contact'; }
+	else if (req.path.startsWith('/admin')){ pageName = 'admin'; }
+
+	res.locals.pageName = pageName;
 	next();
 });
 
