@@ -42,7 +42,6 @@ app.use((req, res, next) => {
 	if (req.path === '/meet-the-team'){ pageName = 'meet_the_team'; }
 	else if (req.path === '/accomplishments'){ pageName = 'accomplishments'; }
 	else if (req.path === '/whats-a-pc'){ pageName = 'whats-a-pc'; }
-	else if (req.path === '/volunteer'){ pageName = 'volunteer'; }
 	else if (req.path === '/contact'){ pageName = 'contact'; }
 	else if (req.path.startsWith('/admin')){ pageName = 'admin'; }
 
