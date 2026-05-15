@@ -42,6 +42,7 @@ app.use((req, res, next) => {
 	if (req.path === '/meet-the-team'){ pageName = 'meet_the_team'; }
 	else if (req.path === '/accomplishments'){ pageName = 'accomplishments'; }
 	else if (req.path === '/whats-a-pc'){ pageName = 'whats-a-pc'; }
+	else if (req.path === '/negative-claims'){ pageName = 'negative-claims'; }
 	else if (req.path === '/contact'){ pageName = 'contact'; }
 	else if (req.path.startsWith('/admin')){ pageName = 'admin'; }
 
@@ -68,6 +69,7 @@ app.get('/', (req, res) => res.render('index'));
 app.get('/meet-the-team', (req, res) => res.render('meet-the-team'));
 app.get('/accomplishments', (req, res) => res.render('accomplishments'));
 app.get('/whats-a-pc', (req, res) => res.render('whats-a-pc'));
+app.get('/negative-claims', (req, res) => res.render('negative-claims'));
 app.get('/contact', (req, res) => {
 	res.render('contact', { 
 		submitted: req.query.submitted === 'true',
