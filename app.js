@@ -66,6 +66,8 @@ const requireAdmin = (req, res, next) => {
 // Routes
 app.get('/', (req, res) => res.render('index'));
 app.get('/meet-the-team', (req, res) => res.render('meet-the-team'));
+app.get('/accomplishments', (req, res) => res.render('accomplishments'));
+app.get('/whats-a-pc', (req, res) => res.render('whats-a-pc'));
 app.get('/contact', (req, res) => {
 	res.render('contact', { 
 		submitted: req.query.submitted === 'true',

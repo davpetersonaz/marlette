@@ -1,0 +1,116 @@
+<!-- /views/accomplishments.ejs -->
+<%- include('partials/header') %>
+
+<!-- PAGE HEADER -->
+<section class="pt-20 pb-16 bg-[color:var(--warm-white)]">
+    <div class="max-w-6xl mx-auto px-6 text-center">
+        <h1 class="text-5xl md:text-6xl font-bold text-navy mb-6">Our Accomplishments</h1>
+        <p class="text-2xl md:text-3xl text-gray-600 max-w-3xl mx-auto leading-tight">
+            Real Results from Real Grassroots Work
+        </p>
+    </div>
+</section>
+
+<!-- WHAT WE'VE ACCOMPLISHED -->
+<section class="py-20 bg-white">
+    <div class="max-w-6xl mx-auto px-6">
+        <h2 class="text-4xl font-bold text-navy text-center mb-4">What We've Accomplished</h2>
+        <div class="w-48 h-1 bg-accent mx-auto mb-12"></div>
+
+        <div class="space-y-16">
+
+			<!-- Postcard Writing -->
+			<div class="grid md:grid-cols-2 gap-10 items-center">
+				<div class="grid grid-cols-2 gap-4">
+					<img src="/images/PC picture 7-cropped.jpeg" 
+						alt="Postcard Party" 
+						class="accomplishment-img w-full h-64 object-cover rounded-2xl shadow-md">
+					<img src="/images/PC Picture 8-cropped.jpeg" 
+						alt="Postcard Party" 
+						class="accomplishment-img w-full h-64 object-cover rounded-2xl shadow-md">
+				</div>
+				<div>
+					<h3 class="text-2xl font-semibold text-navy mb-4">Postcard Writing Parties</h3>
+					<p class="text-gray-600 leading-relaxed">
+						We held several postcard writing parties in partnership with EZAZ. 
+						Postcards were sent to non-voters encouraging them to register. 
+						Since September 2025, over <strong>4,000 people</strong> have registered — 
+						<strong>75% with the Republican Party</strong>.
+					</p>
+				</div>
+			</div>
+
+            <!-- Voter Registration -->
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h3 class="text-2xl font-semibold text-navy mb-4">Voter Registration Tables</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        We manned voter registration tables at multiple community events.
+                    </p>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <img src="/images/PC Picture 3-cropped.jpg" 
+						alt="Voter Registration" 
+						class="accomplishment-img w-full h-64 object-cover rounded-2xl shadow-md">
+                    <img src="/images/PC Picture 9-cropped.JPG" 
+						alt="Voter Registration" 
+						class="accomplishment-img w-full h-64 object-cover rounded-2xl shadow-md">
+                </div>
+            </div>
+
+            <!-- Campaign Signs -->
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div class="grid grid-cols-2 gap-4">
+                    <img src="/images/PC Picture 5-cropped.jpg" 
+						alt="Campaign Signs" 
+						class="accomplishment-img w-full h-64 object-cover rounded-2xl shadow-md">
+                    <img src="/images/PC Picture 6-cropped.jpeg" 
+						alt="Campaign Signs" 
+						class="accomplishment-img w-full h-64 object-cover rounded-2xl shadow-md">
+                </div>
+                <div>
+                    <h3 class="text-2xl font-semibold text-navy mb-4">Campaign Sign Installation</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        We installed hundreds of candidate campaign signs across the precinct.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Voter Guides -->
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <div>
+                    <h3 class="text-2xl font-semibold text-navy mb-4">Voter Guides</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        In 2024, we delivered <strong>over 10,000 voter guides</strong> (English & Spanish) 
+                        to doors and by text messaging.
+                    </p>
+                </div>
+                <img src="/images/Voter Guides Collage.jpg" alt="Voter Guides Collage" class="accomplishment-img rounded-2xl shadow-md">
+            </div>
+
+            <!-- Ballot Texting -->
+            <div class="grid md:grid-cols-2 gap-10 items-center">
+                <img src="/images/Ballot.jpg" alt="Ballot Reminders" class="accomplishment-img rounded-2xl shadow-md">
+                <div>
+                    <h3 class="text-2xl font-semibold text-navy mb-4">Ballot Turn-In Reminders</h3>
+                    <p class="text-gray-600 leading-relaxed">
+                        We texted hundreds of voters reminding them to return their ballots in 2024.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Petitions -->
+            <div>
+                <h3 class="text-2xl font-semibold text-navy mb-4">Petition Signature Gathering</h3>
+                <p class="text-gray-600 leading-relaxed text-lg">
+                    We collected <strong>over 1,000 petition signatures</strong> for Republican candidates.
+                </p>
+            </div>
+
+        </div>
+    </div>
+</section>
+
+<%- include('partials/call-to-action') %>
+
+<%- include('partials/footer') %>

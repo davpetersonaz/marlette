@@ -18,9 +18,9 @@
         </p>
         
         <div class="mt-12 flex flex-col sm:flex-row gap-6 justify-center">
-            <a href="/meet-the-team" 
-               class="bg-white text-navy hover:bg-accent hover:text-white px-10 py-5 rounded-2xl text-lg md:text-xl font-semibold transition-all duration-300 shadow-lg">
-                Meet the Team
+            <a href="/accomplishments" 
+               class="border-2 border-white hover:bg-white hover:text-navy px-10 py-5 rounded-2xl text-lg md:text-xl font-semibold transition-all duration-300">
+                Our Accomplishments
             </a>
             <a href="/contact" 
                class="border-2 border-white hover:bg-white hover:text-navy px-10 py-5 rounded-2xl text-lg md:text-xl font-semibold transition-all duration-300">
@@ -119,16 +119,6 @@
     </div>
 </section>
 
-<!-- FINAL CALL TO ACTION -->
-<section class="py-24 bg-navy text-white text-center">
-    <div class="max-w-2xl mx-auto px-6">
-        <h2 class="text-4xl md:text-5xl font-bold mb-6">Ready to help strengthen our precinct?</h2>
-        <p class="text-xl mb-10">Join the team that’s already doing the work.</p>
-        <a href="/contact" 
-           class="inline-block bg-accent hover:bg-red-700 text-white px-12 py-6 rounded-2xl text-2xl font-semibold transition-all">
-            Volunteer With Us
-        </a>
-    </div>
-</section>
+<%- include('partials/call-to-action') %>
 
 <%- include('partials/footer') %>

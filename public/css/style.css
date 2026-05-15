@@ -840,6 +840,10 @@ video {
   max-width: 20rem;
 }
 
+.max-w-none {
+  max-width: none;
+}
+
 .flex-shrink-0 {
   flex-shrink: 0;
 }
@@ -875,6 +879,10 @@ video {
 
 .resize-y {
   resize: vertical;
+}
+
+.list-none {
+  list-style-type: none;
 }
 
 .grid-cols-1 {
@@ -976,6 +984,12 @@ video {
   --tw-space-y-reverse: 0;
   margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
   margin-bottom: calc(2rem * var(--tw-space-y-reverse));
+}
+
+.space-y-4 > :not([hidden]) ~ :not([hidden]) {
+  --tw-space-y-reverse: 0;
+  margin-top: calc(1rem * calc(1 - var(--tw-space-y-reverse)));
+  margin-bottom: calc(1rem * var(--tw-space-y-reverse));
 }
 
 .divide-y > :not([hidden]) ~ :not([hidden]) {
