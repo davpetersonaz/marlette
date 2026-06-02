@@ -73,7 +73,15 @@ app.get('/negative-claims', (req, res) => res.render('negative-claims'));
 app.get('/contact', (req, res) => {
 	res.render('contact', { 
 		submitted: req.query.submitted === 'true',
-		error: req.query.error === 'true'
+		error: req.query.error === 'true',
+		showVolunteerOptions: false
+	});
+});
+app.get('/volunteer', (req, res) => {
+	res.render('contact', { 
+		submitted: req.query.submitted === 'true',
+		error: req.query.error === 'true',
+		showVolunteerOptions: true
 	});
 });
 
