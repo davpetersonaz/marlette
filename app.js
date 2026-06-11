@@ -64,13 +64,20 @@ const requireAdmin = (req, res, next) => {
 	next();
 };
 
+const rateLimit = require('express-rate-limit');
+const contactLimiter = rateLimit({
+	windowMs: 30 * 60 * 1000, // 30 minutes
+	max: 2, // max 3 submissions per IP
+	message: 'Too many submissions. Please try again later.'
+});
+
 // Routes
 app.get('/', (req, res) => res.render('index'));
 app.get('/meet-the-team', (req, res) => res.render('meet-the-team'));
 app.get('/accomplishments', (req, res) => res.render('accomplishments'));
 app.get('/whats-a-pc', (req, res) => res.render('whats-a-pc'));
 app.get('/negative-claims', (req, res) => res.render('negative-claims'));
-app.get('/contact', (req, res) => {
+app.get('/contact', contactLimiter, async (req, res) => {
 	res.render('contact', { 
 		submitted: req.query.submitted === 'true',
 		error: req.query.error === 'true',
@@ -86,8 +93,14 @@ app.get('/volunteer', (req, res) => {
 });
 
 // CONTACT / VOLUNTEER FORM
-app.post('/contact', async (req, res) => {
-	const { firstName, lastName, email, phone, message, volunteerOptions } = req.body;
+app.post('/contact', contactLimiter, async (req, res) => {
+	const { firstName, lastName, email, phone, message, volunteerOptions, honeypot } = req.body;
+
+	// Reject spam bots
+	if (req.body.website && req.body.website.length > 0) {
+		console.log('🚫 Honeypot caught spam attempt');
+		return res.redirect('/contact?submitted=true'); // silent success for bots
+	}
 
 	try {
 		await pool.query(`

@@ -26,6 +26,13 @@
 		<% } %>
 
 		<form action="/contact" method="POST" class="space-y-8">
+
+			<!-- HONEYPOT - Add this inside the form (preferably near the top) -->
+			<div style="position: absolute; left: -9999px; opacity:0;">
+				<label>Leave this field blank</label>
+				<input type="text" name="website" tabindex="-1" autocomplete="off">
+			</div>
+
 			<div class="grid md:grid-cols-2 gap-6">
 				<div>
 					<label class="block text-sm font-medium text-gray-700 mb-2">First Name <span class="text-red-500">*</span></label>
