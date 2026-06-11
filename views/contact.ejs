@@ -26,6 +26,7 @@
 		<% } %>
 
 		<form action="/contact" method="POST" class="space-y-8">
+			<input type="hidden" id="recaptcha-token" name="recaptchaToken">
 
 			<!-- HONEYPOT - Add this inside the form (preferably near the top) -->
 			<div style="position: absolute; left: -9999px; opacity:0;">
@@ -105,7 +106,9 @@
 				</div>
 			<% } %>
 
-			<button type="submit" class="w-full bg-navy hover:bg-accent text-white py-6 rounded-3xl text-xl font-semibold transition-all duration-300 mt-6">
+			<button type="submit" id="submit-btn"
+				class="w-full bg-navy hover:bg-accent text-white py-6 rounded-3xl text-xl font-semibold transition-all duration-300 mt-6"
+			>
 				Submit
 			</button>
 		</form>

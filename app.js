@@ -64,6 +64,13 @@ const requireAdmin = (req, res, next) => {
 	next();
 };
 
+// Make important env vars available to all EJS templates
+app.use((req, res, next) => {
+	res.locals.GOOGLE_SITE_KEY = process.env.GOOGLE_SITE_KEY || '';
+	next();
+});
+
+// apply form rate limiter
 const rateLimit = require('express-rate-limit');
 const contactLimiter = rateLimit({
 	windowMs: 30 * 60 * 1000, // 30 minutes
@@ -94,7 +101,7 @@ app.get('/volunteer', (req, res) => {
 
 // CONTACT / VOLUNTEER FORM
 app.post('/contact', contactLimiter, async (req, res) => {
-	const { firstName, lastName, email, phone, message, volunteerOptions, honeypot } = req.body;
+	const { firstName, lastName, email, phone, message, volunteerOptions, recaptchaToken, honeypot } = req.body;
 
 	// Reject spam bots
 	if (req.body.website && req.body.website.length > 0) {
@@ -102,12 +109,29 @@ app.post('/contact', contactLimiter, async (req, res) => {
 		return res.redirect('/contact?submitted=true'); // silent success for bots
 	}
 
+	// reCAPTCHA Verification
+	if (!recaptchaToken) { return res.redirect('/contact?error=true'); }
+	try {
+		const verifyUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${recaptchaToken}`;
+		const verifyResponse = await fetch(verifyUrl);
+		const verifyData = await verifyResponse.json();
+
+		if (!verifyData.success || verifyData.score < 0.5) {
+			console.log('reCAPTCHA failed or low score:', verifyData);
+			return res.redirect('/contact?error=true');
+		}
+	} catch (e) {
+		console.error('reCAPTCHA verification error:', e);
+		return res.redirect('/contact?error=true');
+	}
+
 	try {
 		await pool.query(`
 			INSERT INTO submissions 
 			(type, first_name, last_name, email, phone, message, volunteer_options)
 			VALUES ($1, $2, $3, $4, $5, $6, $7)
-		`, [
+		`, 
+		[
 			volunteerOptions && volunteerOptions.length > 0 ? 'volunteer' : 'contact',
 			firstName,
 			lastName,

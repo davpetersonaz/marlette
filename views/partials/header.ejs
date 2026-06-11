@@ -71,6 +71,25 @@
 	<link rel="stylesheet" href="/css/style.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
     <meta name="description" content="Grassroots Republican team serving Marlette Precinct">
+
+	<!-- reCAPTCHA v3 -->
+	<script src="https://www.google.com/recaptcha/api.js?render=<%= GOOGLE_SITE_KEY %>"></script>
+	<script>
+		grecaptcha.ready(function() {
+			// Execute reCAPTCHA when form is submitted
+			const form = document.querySelector('form[action="/contact"]');
+			if (form) {
+				form.addEventListener('submit', function(e) {
+					e.preventDefault(); // Prevent immediate submit
+					grecaptcha.execute('<%= GOOGLE_SITE_KEY %>', {action: 'contact_form'})
+					.then(function(token) {
+						document.getElementById('recaptcha-token').value = token;
+						form.submit(); // Now submit the form
+					});
+				});
+			}
+		});
+	</script>
 </head>
 <body data-page-name="<%= pageName || 'home' %>" class="bg-[color:var(--warm-white)] text-gray-800 font-sans">
 
