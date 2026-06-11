@@ -141,33 +141,38 @@ app.post('/contact', contactLimiter, async (req, res) => {
 			Array.isArray(volunteerOptions) ? volunteerOptions : []
 		]);
 
+		// Send emails to multiple recipients
+		const recipients = process.env.EMAIL_USER.split(',').map(e => e.trim());
+
 		// Send email notification
 		const transporter = nodemailer.createTransport({
 			service: 'gmail',
 			auth: {
-				user: process.env.EMAIL_USER,
+				user: recipients[0],	// Use first email for sending
 				pass: process.env.EMAIL_PASS
 			}
 		});
 
-		await transporter.sendMail({
-			from: `"Marlette Precinct" <${process.env.EMAIL_USER}>`,
-			to: process.env.EMAIL_USER,
-			replyTo: email,
-			subject: `New ${volunteerOptions && volunteerOptions.length ? 'Volunteer' : 'Contact'} Form Submission`,
-			html: `
-				<h2>New Submission</h2>
-				<p><strong>Name:</strong> ${firstName} ${lastName}</p>
-				<p><strong>Email:</strong> ${email}</p>
-				${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
-				${message ? `<p><strong>Message:</strong><br>${message.replace(/\n/g, '<br>')}</p>` : ''}
-				${volunteerOptions && volunteerOptions.length ? `<p><strong>Volunteer Interests:</strong> ${volunteerOptions.join(', ')}</p>` : ''}
-			`
-		});
+		const emailContent = `
+			<h2>New Submission</h2>
+			<p><strong>Name:</strong> ${firstName} ${lastName}</p>
+			<p><strong>Email:</strong> ${email}</p>
+			${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
+			${message ? `<p><strong>Message:</strong><br>${message.replace(/\n/g, '<br>')}</p>` : ''}
+			${volunteerOptions && volunteerOptions.length ? `<p><strong>Volunteer Interests:</strong> ${volunteerOptions.join(', ')}</p>` : ''}
+    	`;
 
+		// Send to all recipients
+		await transporter.sendMail({
+			from: `"Marlette Precinct" <${recipients[0]}>`,
+			to: recipients.join(', '),
+			replyTo: email,
+			subject: `New ${volunteerOptions?.length ? 'Volunteer' : 'Contact'} Submission`,
+			html: emailContent
+		});
 		res.redirect('/contact?submitted=true');
 	} catch (err) {
-    	console.error('Submission error:', err);
+		console.error('Submission error:', err);
 		res.redirect('/contact?error=true');
 	}
 });

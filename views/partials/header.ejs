@@ -35,14 +35,17 @@
 				}
 			});
 
-			// Contact Form
-			const contactForm = document.querySelector('form[action="/contact"]');
-			if (contactForm) {
-				contactForm.addEventListener('submit', function() {
-					trackEvent('form_submit', {
-						form_id: 'contact_form',
-						page_name: pageName
-					});
+			// Contact Form - Single listener + prevent double submit
+			const form = document.getElementById('contactForm');
+			const submitBtn = document.getElementById('submitBtn');
+			if (form && submitBtn) {
+				form.addEventListener('submit', function() {
+					submitBtn.disabled = true;
+					submitBtn.textContent = 'Sending...';
+						trackEvent('form_submit', {
+							form_id: 'contact_form',
+							page_name: pageName
+						});
 				});
 			}
 

@@ -25,7 +25,7 @@
 			</div>
 		<% } %>
 
-		<form action="/contact" method="POST" class="space-y-8">
+		<form action="/contact" method="POST" id="contact-form" class="space-y-8">
 			<input type="hidden" id="recaptcha-token" name="recaptchaToken">
 
 			<!-- HONEYPOT - Add this inside the form (preferably near the top) -->
@@ -112,6 +112,15 @@
 				Submit
 			</button>
 		</form>
+
+		<script>
+			document.getElementById('contact-form').addEventListener('submit', function() {
+				const btn = document.getElementById('submit-btn');
+				btn.disabled = true;
+				btn.textContent = 'Sending...';
+			});
+		</script>
+
 	</div>
 </section>
 
