@@ -240,6 +240,23 @@ app.post('/admin/highlight', requireAdmin, async (req, res) => {
 	res.sendStatus(200);
 });
 
+// Get single submission for modal
+app.get('/admin/submission/:id', requireAdmin, async (req, res) => {
+    try {
+        const result = await pool.query(
+            'SELECT * FROM submissions WHERE id = $1', 
+            [req.params.id]
+        );
+        if (result.rows.length === 0) {
+            return res.status(404).json({ error: 'Submission not found' });
+        }
+        res.json(result.rows[0]);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ error: 'Database error' });
+    }
+});
+
 // Export to CSV
 app.get('/admin/export-csv', requireAdmin, async (req, res) => {
 	try {
