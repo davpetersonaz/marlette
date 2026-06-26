@@ -23,7 +23,7 @@
 		document.addEventListener('DOMContentLoaded', function() {
 			const pageName = document.body.getAttribute('data-page-name') || 'home';
 
-			// Track all navigation links
+    		// === Track Navigation Clicks (once) ===
 			document.addEventListener('click', function(e) {
 				const link = e.target.closest('a[href]');
 				if (link) {
@@ -35,11 +35,11 @@
 				}
 			});
 
-			// Contact Form - Single listener + prevent double submit
-			const form = document.getElementById('contactForm');
+			// === Contact Form Submission ===
+			const contactForm = document.getElementById('contactForm');
 			const submitBtn = document.getElementById('submitBtn');
-			if (form && submitBtn) {
-				form.addEventListener('submit', function() {
+			if (contactForm && submitBtn) {
+				contactForm.addEventListener('submit', function() {
 					submitBtn.disabled = true;
 					submitBtn.textContent = 'Sending...';
 						trackEvent('form_submit', {
@@ -49,7 +49,7 @@
 				});
 			}
 
-		    // Admin Login Attempts
+    		// === Admin Login Attempts ===
 			const loginForm = document.querySelector('form[action="/admin/login"]');
 			if (loginForm) {
 				loginForm.addEventListener('submit', function() {
@@ -59,7 +59,7 @@
 				});
 			}
 
-		    // Accomplishment Image Clicks
+    		// === Accomplishment Image Clicks ===
 			document.querySelectorAll('.accomplishment-img').forEach(img => {
 				img.addEventListener('click', () => {
 					trackEvent('image_click', { 

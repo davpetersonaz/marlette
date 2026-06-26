@@ -39,11 +39,13 @@ app.use((req, res, next) => {
 
 	// Page name
 	let pageName = 'home';
-	if (req.path === '/meet-the-team'){ pageName = 'meet_the_team'; }
+	if (req.path === '/'){ pageName = 'home'; }
 	else if (req.path === '/accomplishments'){ pageName = 'accomplishments'; }
-	else if (req.path === '/whats-a-pc'){ pageName = 'whats-a-pc'; }
+	else if (req.path === '/contact' || req.path === '/volunteer'){ pageName = 'contact'; }
 	else if (req.path === '/forrestwoodwick'){ pageName = 'forrestwoodwick'; }
-	else if (req.path === '/contact'){ pageName = 'contact'; }
+	else if (req.path === '/meet-the-team'){ pageName = 'meet_the_team'; }
+	else if (req.path === '/negative-claims'){ pageName = 'negative-claims'; }
+	else if (req.path === '/whats-a-pc'){ pageName = 'whats-a-pc'; }
 	else if (req.path.startsWith('/admin')){ pageName = 'admin'; }
 
 	res.locals.pageName = pageName;
