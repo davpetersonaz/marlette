@@ -56,12 +56,15 @@ function reInvite(email) {
         fetch('/admin/reinvite', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email })
+            body: JSON.stringify({ email: email })
         })
-        .then(response => response.text())
-        .then(text => {
-            alert(text);
-            location.reload();
+        .then(response => {
+            if (response.ok) {
+                alert('Invite sent successfully!');
+                location.reload();
+            } else {
+                alert('Failed to send invite');
+            }
         })
         .catch(err => {
             console.error(err);
