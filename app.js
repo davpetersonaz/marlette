@@ -21,7 +21,7 @@ app.use(session({
 	store: new PgSession({
   		pool: new Pool({ 
 			connectionString: process.env.DATABASE_URL,
-			ssl: false 
+			ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 		}),
 		tableName: 'sessions'
 	}),
