@@ -376,6 +376,23 @@ app.post('/admin/delete', requireAdmin, async (req, res) => {
 	}
 });
 
+// Users Management Page
+app.get('/admin/users', requireAdmin, async (req, res) => {
+	try {
+		const result = await pool.query(`
+			SELECT id, email, name, active, created_at
+			FROM admins 
+			ORDER BY created_at DESC
+		`);
+		res.render('admin-users', { 
+			admins: result.rows 
+		});
+	} catch (e) {
+		console.error(e);
+		res.send('Database error: '+e.message);
+	}
+});
+
 app.get('/admin/logout', (req, res) => {
 	req.session.destroy(() => res.redirect('/'));
 });
@@ -426,6 +443,50 @@ app.post('/admin/invite', requireAdmin, async (req, res) => {
 	}
 });
 
+// Re-invite existing admin
+app.post('/admin/reinvite', requireAdmin, async (req, res) => {
+	const { email } = req.body;
+
+	try {
+		const user = await pool.query('SELECT * FROM admins WHERE email = $1', [email]);
+		if (user.rows.length === 0) {
+			return res.status(404).send('User not found');
+		}
+
+		const token = crypto.randomBytes(32).toString('hex');
+		const expiresAt = new Date(Date.now() + 48 * 60 * 60 * 1000);
+
+		await pool.query(`
+			INSERT INTO invite_tokens (email, token, expires_at, invited_by)
+			VALUES ($1, $2, $3, $4)
+			ON CONFLICT (email) DO UPDATE 
+			SET token = $2, expires_at = $3
+		`, [email, token, expiresAt, req.session.adminName || 'admin']);
+
+		const inviteLink = `https://${req.get('host')}/admin/signup?token=${token}&email=${encodeURIComponent(email)}`;
+		const transporter = nodemailer.createTransport({
+			service: 'gmail',
+			auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+		});
+		await transporter.sendMail({
+			from: `"Marlette Precinct Admin" <${process.env.EMAIL_USER}>`,
+			to: email,
+			subject: "New Invite to Marlette Precinct Admin Panel",
+			html: `
+				<h2>Admin Invite</h2>
+				<p>You have been re-invited to the Marlette Precinct Admin Panel.</p>
+				<p><a href="${inviteLink}" style="background:#1D3557;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;">Set Password & Login</a></p>
+				<p><small>This link expires in 48 hours.</small></p>
+			`
+		});
+
+		res.send('Invite sent successfully');
+	} catch (e) {
+		console.error(e);
+		res.status(500).send('Failed to send invite');
+	}
+});
+
 // Signup Page (from invite link)
 app.get('/admin/signup', async (req, res) => {
 	const { token, email } = req.query;
@@ -471,6 +532,18 @@ app.post('/admin/signup', async (req, res) => {
 	} catch (e) {
 		console.error(e);
 		res.send('Error creating account');
+	}
+});
+
+// Delete Admin
+app.post('/admin/delete-admin', requireAdmin, async (req, res) => {
+	const { id } = req.body;
+	try {
+		await pool.query('DELETE FROM admins WHERE id = $1', [id]);
+		res.send('Admin deleted');
+	} catch (e) {
+		console.error(e);
+		res.status(500).send('Failed to delete admin');
 	}
 });
 
