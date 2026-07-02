@@ -144,7 +144,7 @@ app.post('/contact', contactLimiter, async (req, res) => {
 		]);
 
 		// Send emails to multiple recipients
-		const recipients = process.env.EMAIL_USER.split(',').map(e => e.trim());
+		const recipients = process.env.EMAIL_RECIPIENTS;
 
 		// Send email notification
 		const transporter = nodemailer.createTransport({
@@ -154,7 +154,6 @@ app.post('/contact', contactLimiter, async (req, res) => {
 				pass: process.env.EMAIL_PASS
 			}
 		});
-		const recipients = process.env.EMAIL_RECIPIENTS;
 
 		const emailContent = `
 			<h2>New Submission</h2>
