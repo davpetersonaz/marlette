@@ -150,10 +150,11 @@ app.post('/contact', contactLimiter, async (req, res) => {
 		const transporter = nodemailer.createTransport({
 			service: 'gmail',
 			auth: {
-				user: recipients[0],	// Use first email for sending
+				user: process.env.EMAIL_USER,
 				pass: process.env.EMAIL_PASS
 			}
 		});
+		const recipients = process.env.EMAIL_RECIPIENTS;
 
 		const emailContent = `
 			<h2>New Submission</h2>
@@ -166,8 +167,8 @@ app.post('/contact', contactLimiter, async (req, res) => {
 
 		// Send to all recipients
 		await transporter.sendMail({
-			from: `"Marlette Precinct" <${recipients[0]}>`,
-			to: recipients.join(', '),
+			from: `"Marlette Precinct" <${process.env.EMAIL_USER}>`,
+			to: recipients,
 			replyTo: email,
 			subject: `New ${volunteerOptions?.length ? 'Volunteer' : 'Contact'} Submission`,
 			html: emailContent
