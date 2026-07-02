@@ -76,7 +76,7 @@ app.use((req, res, next) => {
 const rateLimit = require('express-rate-limit');
 const contactLimiter = rateLimit({
 	windowMs: 30 * 60 * 1000, // 30 minutes
-	max: 2, // max 3 submissions per IP
+	max: 3, // max 3 submissions per IP
 	message: 'Too many submissions. Please try again later.'
 });
 
@@ -86,7 +86,7 @@ app.get('/meet-the-team', (req, res) => res.render('meet-the-team'));
 app.get('/accomplishments', (req, res) => res.render('accomplishments'));
 app.get('/whats-a-pc', (req, res) => res.render('whats-a-pc'));
 app.get('/forrestwoodwick', (req, res) => res.render('forrestwoodwick'));
-app.get('/contact', contactLimiter, async (req, res) => {
+app.get('/contact', (req, res) => {
 	res.render('contact', { 
 		submitted: req.query.submitted === 'true',
 		error: req.query.error === 'true',
@@ -213,6 +213,91 @@ app.post('/admin/login', async (req, res) => {
 	} catch (e) {
 		console.error(e);
 		res.render('admin-login', { error: true });
+	}
+});
+
+// Forgot Password Page
+app.get('/admin/forgot-password', (req, res) => {
+	res.render('admin-forgot-password', { sent: false, error: false });
+});
+
+app.post('/admin/forgot-password', async (req, res) => {
+	const { email } = req.body;
+
+	try {
+		const user = await pool.query('SELECT * FROM admins WHERE email = $1', [email]);
+		if (user.rows.length === 0) {
+			return res.render('admin-forgot-password', { sent: false, error: true });
+		}
+
+		const token = crypto.randomBytes(32).toString('hex');
+		const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
+
+		await pool.query(`
+			INSERT INTO password_reset_tokens (email, token, expires_at)
+			VALUES ($1, $2, $3)
+			ON CONFLICT (email) DO UPDATE 
+			SET token = $2, expires_at = $3
+		`, [email, token, expiresAt]);
+
+		const resetLink = `https://${req.get('host')}/admin/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+
+		const transporter = nodemailer.createTransport({
+			service: 'gmail',
+			auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+		});
+
+		await transporter.sendMail({
+			from: `"Marlette Precinct Admin" <${process.env.EMAIL_USER}>`,
+			to: email,
+			subject: "Password Reset Request",
+			html: `
+				<h2>Reset Your Password</h2>
+				<p>Click the link below to reset your admin password:</p>
+				<p><a href="${resetLink}" style="background:#1D3557;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;">Reset Password</a></p>
+				<p><small>This link expires in 2 hours.</small></p>
+			`
+		});
+
+		res.render('admin-forgot-password', { sent: true, error: false });
+	} catch (e) {
+		console.error(e);
+		res.render('admin-forgot-password', { sent: false, error: true });
+	}
+});
+
+// Reset Password page
+app.get('/admin/reset-password', (req, res) => {
+	const { token, email } = req.query;
+	res.render('admin-reset-password', { token, email, error: false });
+});
+
+// Reset Password POST
+app.post('/admin/reset-password', async (req, res) => {
+	const { email, token, password } = req.body;
+
+	try {
+		const tokenCheck = await pool.query(
+			'SELECT * FROM password_reset_tokens WHERE email = $1 AND token = $2 AND expires_at > NOW()',
+			[email, token]
+		);
+		if (tokenCheck.rows.length === 0) {
+			return res.send('Invalid or expired reset link.');
+		}
+
+		const hashedPassword = await bcrypt.hash(password, 12);
+		await pool.query(
+			'UPDATE admins SET password_hash = $1 WHERE email = $2',
+			[hashedPassword, email]
+		);
+
+		// Clean up used token
+		await pool.query('DELETE FROM password_reset_tokens WHERE email = $1', [email]);
+
+		res.send('Password updated successfully. <a href="/admin/login">Go to Login</a>');
+	} catch (e) {
+		console.error(e);
+		res.send('Error updating password');
 	}
 });
 

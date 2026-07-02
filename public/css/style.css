@@ -1367,6 +1367,10 @@ video {
   text-align: center;
 }
 
+.text-right {
+  text-align: right;
+}
+
 .font-sans {
   font-family: Inter, system-ui, sans-serif;
 }
