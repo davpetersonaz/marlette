@@ -1056,10 +1056,6 @@ video {
   overflow-x: auto;
 }
 
-.whitespace-pre-wrap {
-  white-space: pre-wrap;
-}
-
 .break-all {
   word-break: break-all;
 }

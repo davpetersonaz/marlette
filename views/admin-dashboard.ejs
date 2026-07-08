@@ -89,6 +89,7 @@
                             	<td class="px-4 py-4 text-center" onclick="event.stopImmediatePropagation()">
 									<% if (!sub.deleted_at) { %>
 									<form action="/admin/delete" method="POST" style="display: inline;">
+										<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 										<input type="hidden" name="id" value="<%= sub.id %>">
 											<button type="submit" onclick="return confirm('Delete this?')" 
 													class="text-red-600 hover:text-red-800 text-sm font-medium">Delete</button>
@@ -132,34 +133,51 @@
 <script>
 let currentSubmissionId = null;
 
-function showSubmissionDetail(row) {
+async function showSubmissionDetail(row) {
     const id = row.getAttribute('data-submission-id');
     currentSubmissionId = id;   // Store ID for delete
     
-    fetch(`/admin/submission/${id}`)
-        .then(response => response.json())
-        .then(sub => {
-			const modal = document.getElementById('submissionModal');
-			const nameEl = document.getElementById('modalName');
-			const contentEl = document.getElementById('modalContent');
-			nameEl.textContent = `${sub.first_name} ${sub.last_name}`;
-			let html = `
-				<p><strong>Email:</strong> ${sub.email || '—'}</p>
-				${sub.phone ? `<p><strong>Phone:</strong> ${sub.phone}</p>` : ''}
-				<p><strong>Type:</strong> ${sub.type}</p>
-				${sub.volunteer_options && sub.volunteer_options.length ? 
-					`<p><strong>Volunteer Interests:</strong> ${sub.volunteer_options.join(', ')}</p>` : ''}
-				${sub.message ? `<p><strong>Message:</strong><br><span class="whitespace-pre-wrap">${sub.message.replace(/\n/g, '<br>')}</span></p>` : ''}
-				<p><strong>Submitted:</strong> ${new Date(sub.created_at).toLocaleString()}</p>
-			`;
+    try {
+        const response = await fetch(`/admin/submission/${id}`);
+        if (!response.ok) throw new Error('Failed to load');
 
-			contentEl.innerHTML = html;
-			modal.classList.remove('hidden');
-        })
-        .catch(e => {
-			console.error(e);
-			alert('Could not load submission details');
+        const sub = await response.json();
+        const modal = document.getElementById('submissionModal');
+        const nameEl = document.getElementById('modalName');
+        const contentEl = document.getElementById('modalContent');
+
+        nameEl.textContent = `${sub.first_name} ${sub.last_name}`;
+
+        // Safe DOM construction (no innerHTML)
+        contentEl.innerHTML = ''; // Clear previous
+
+        const fields = [
+            { label: "Email", value: sub.email },
+            { label: "Phone", value: sub.phone },
+            { label: "Type", value: sub.type },
+            { label: "Volunteer Interests", value: sub.volunteer_options?.join(', ') },
+            { label: "Message", value: sub.message },
+            { label: "Submitted", value: new Date(sub.created_at).toLocaleString() }
+        ];
+
+        fields.forEach(field => {
+            if (field.value) {
+                const p = document.createElement('p');
+                p.innerHTML = `<strong>${field.label}:</strong> `;
+                
+                const valueSpan = document.createElement('span');
+                valueSpan.textContent = field.value;  // Safe textContent
+                p.appendChild(valueSpan);
+                
+                contentEl.appendChild(p);
+            }
         });
+
+        modal.classList.remove('hidden');
+    } catch (e) {
+        console.error(e);
+        alert('Could not load submission details');
+    }
 }
 
 function deleteFromModal() {

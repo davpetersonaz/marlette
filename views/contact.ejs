@@ -26,6 +26,7 @@
 		<% } %>
 
 		<form action="/contact" method="POST" id="contact-form" class="space-y-8">
+			<input type="hidden" name="_csrf" value="<%= csrfToken %>">
 			<input type="hidden" id="recaptcha-token" name="recaptchaToken">
 
 			<!-- HONEYPOT - Add this inside the form (preferably near the top) -->

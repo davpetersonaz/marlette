@@ -16,6 +16,7 @@
         <% } %>
 
         <form action="/admin/invite" method="POST" class="space-y-6">
+			<input type="hidden" name="_csrf" value="<%= csrfToken %>">
             <div>
                 <label class="block text-sm font-medium mb-2">Full Name (optional)</label>
                 <input type="text" name="name" class="w-full px-5 py-4 border border-gray-300 rounded-2xl">

@@ -6,6 +6,25 @@ const nodemailer = require('nodemailer');
 const { Pool } = require('pg');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
+const rateLimit = require('express-rate-limit');
+const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+
+// Rate limiter for admin login
+const adminLoginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // max 5 attempts per IP
+    message: 'Too many login attempts. Please try again later.',
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+
+// Form rate limiter
+const contactLimiter = rateLimit({
+	windowMs: 30 * 60 * 1000, // 30 minutes
+	max: 3, // max 3 submissions per IP
+	message: 'Too many submissions. Please try again later.'
+});
+
 const app = express();
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
@@ -29,8 +48,23 @@ app.use(session({
 	secret: process.env.SESSION_SECRET || 'marlette-precinct-2026',
 	resave: false,
 	saveUninitialized: false,
-	cookie: { maxAge: 1000 * 60 * 60 * 24 * 7 } // 7 days
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',   // true on HTTPS
+        sameSite: 'strict',
+        maxAge: 1000 * 60 * 60 * 24 * 7   // 7 days
+    }
 }));
+
+// CSRF Protection - Double Submit Cookie
+app.use((req, res, next) => {
+	if (req.method === 'GET') {
+		const token = crypto.randomBytes(32).toString('hex');
+		res.cookie('XSRF-TOKEN', token, { httpOnly: false, sameSite: 'strict' });
+		res.locals.csrfToken = token;
+	}
+	next();
+});
 
 // Pass current page name to all templates
 app.use((req, res, next) => {
@@ -73,14 +107,6 @@ app.use((req, res, next) => {
 	next();
 });
 
-// apply form rate limiter
-const rateLimit = require('express-rate-limit');
-const contactLimiter = rateLimit({
-	windowMs: 30 * 60 * 1000, // 30 minutes
-	max: 3, // max 3 submissions per IP
-	message: 'Too many submissions. Please try again later.'
-});
-
 // Routes
 app.get('/', (req, res) => res.render('index'));
 app.get('/meet-the-team', (req, res) => res.render('meet-the-team'));
@@ -104,6 +130,10 @@ app.get('/volunteer', (req, res) => {
 
 // CONTACT / VOLUNTEER FORM
 app.post('/contact', contactLimiter, async (req, res) => {
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
+
 	const { firstName, lastName, email, phone, message, volunteerOptions, recaptchaToken, honeypot } = req.body;
 
 	// Reject spam bots
@@ -190,7 +220,11 @@ app.get('/admin/login', (req, res) => {
 });
 
 // ADMIN LOGIN - Uses real admins table
-app.post('/admin/login', async (req, res) => {
+app.post('/admin/login', adminLoginLimiter, async (req, res) => {
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
+
 	const { username, password } = req.body;
 	try {
 		const result = await pool.query(
@@ -204,10 +238,14 @@ app.post('/admin/login', async (req, res) => {
 		const admin = result.rows[0];
 		const match = await bcrypt.compare(password, admin.password_hash);
 		if (match) {
-			req.session.admin = true;
-			req.session.adminEmail = admin.email;
-			req.session.adminName = admin.name || admin.email;
-			return res.redirect('/admin/dashboard');
+			// Regenerate session to prevent fixation
+			req.session.regenerate((err) => {
+				if(err){ return res.render('admin-login', { error: true }); }
+				req.session.admin = true;
+				req.session.adminEmail = admin.email;
+				req.session.adminName = admin.name || admin.email;
+				return res.redirect('/admin/dashboard');
+			});
 		} else {
 			return res.render('admin-login', { error: true });
 		}
@@ -223,8 +261,11 @@ app.get('/admin/forgot-password', (req, res) => {
 });
 
 app.post('/admin/forgot-password', async (req, res) => {
-	const { email } = req.body;
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
 
+	const { email } = req.body;
 	try {
 		const user = await pool.query('SELECT * FROM admins WHERE email = $1', [email]);
 		if (user.rows.length === 0) {
@@ -241,7 +282,7 @@ app.post('/admin/forgot-password', async (req, res) => {
 			SET token = $2, expires_at = $3
 		`, [email, token, expiresAt]);
 
-		const resetLink = `https://${req.get('host')}/admin/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+		const resetLink = `${BASE_URL}/admin/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
 
 		const transporter = nodemailer.createTransport({
 			service: 'gmail',
@@ -275,8 +316,11 @@ app.get('/admin/reset-password', (req, res) => {
 
 // Reset Password POST
 app.post('/admin/reset-password', async (req, res) => {
-	const { email, token, password } = req.body;
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
 
+	const { email, token, password } = req.body;
 	try {
 		const tokenCheck = await pool.query(
 			'SELECT * FROM password_reset_tokens WHERE email = $1 AND token = $2 AND expires_at > NOW()',
@@ -323,6 +367,10 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
 
 // Toggle Highlight
 app.post('/admin/highlight', requireAdmin, async (req, res) => {
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
+
 	const { id, highlighted } = req.body;
 	await pool.query('UPDATE submissions SET highlighted = $1 WHERE id = $2', [highlighted, id]);
 	res.sendStatus(200);
@@ -351,7 +399,14 @@ app.get('/admin/export-csv', requireAdmin, async (req, res) => {
 		const result = await pool.query('SELECT * FROM submissions ORDER BY created_at DESC');
 		let csv = 'Date,Name,Type,Email,Phone,Message,Volunteer Options,Highlighted,Deleted\n';
 		result.rows.forEach(row => {
-			csv += `"${row.created_at}","${row.first_name} ${row.last_name}","${row.type}","${row.email}","${row.phone || ''}","${(row.message || '').replace(/"/g, '""')}","${(row.volunteer_options || []).join('; ')}",${row.highlighted},${row.deleted_at ? 'Yes' : 'No'}\n`;
+            const safe = (str) => {
+                if (!str) return '';
+                // Escape formulas and quotes
+                let s = String(str).replace(/"/g, '""');
+                if (/^[=+\-@]/.test(s)) s = "'" + s;
+                return s;
+            };
+            csv += `"${safe(row.created_at)}","${safe(row.first_name)} ${safe(row.last_name)}","${safe(row.type)}","${safe(row.email)}","${safe(row.phone || '')}","${safe(row.message || '')}","${safe((row.volunteer_options || []).join('; '))}","${row.highlighted}","${row.deleted_at ? 'Yes' : 'No'}"\n`;
 		});
 		res.header('Content-Type', 'text/csv');
 		res.attachment('marlette-submissions.csv');
@@ -362,6 +417,10 @@ app.get('/admin/export-csv', requireAdmin, async (req, res) => {
 });
 
 app.post('/admin/delete', requireAdmin, async (req, res) => {
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
+
 	const { id } = req.body;
 	try {
 		await pool.query(`
@@ -406,6 +465,10 @@ app.get('/admin/invite', requireAdmin, (req, res) => {
 });
 
 app.post('/admin/invite', requireAdmin, async (req, res) => {
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
+
 	const { email, name } = req.body;
 	try {
 		const token = crypto.randomBytes(32).toString('hex');
@@ -418,7 +481,7 @@ app.post('/admin/invite', requireAdmin, async (req, res) => {
 			SET token = $2, expires_at = $3, invited_by = $4
 		`, [email, token, expiresAt, 'admin']);
 
-		const inviteLink = `https://${req.get('host')}/admin/signup?token=${token}&email=${encodeURIComponent(email)}`;
+		const inviteLink = `${BASE_URL}/admin/signup?token=${token}&email=${encodeURIComponent(email)}`;
 
 		// Send invite email
 		const transporter = nodemailer.createTransport({
@@ -446,8 +509,11 @@ app.post('/admin/invite', requireAdmin, async (req, res) => {
 
 // Re-invite existing admin
 app.post('/admin/reinvite', requireAdmin, async (req, res) => {
-	const { email } = req.body;
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
 
+	const { email } = req.body;
 	try {
 		const user = await pool.query('SELECT * FROM admins WHERE email = $1', [email]);
 		if (user.rows.length === 0) {
@@ -464,7 +530,7 @@ app.post('/admin/reinvite', requireAdmin, async (req, res) => {
 			SET token = $2, expires_at = $3
 		`, [email, token, expiresAt, req.session.adminName || 'admin']);
 
-		const inviteLink = `https://${req.get('host')}/admin/signup?token=${token}&email=${encodeURIComponent(email)}`;
+		const inviteLink = `${BASE_URL}/admin/signup?token=${token}&email=${encodeURIComponent(email)}`;
 		const transporter = nodemailer.createTransport({
 			service: 'gmail',
 			auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
@@ -506,6 +572,10 @@ app.get('/admin/signup', async (req, res) => {
 });
 
 app.post('/admin/signup', async (req, res) => {
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
+
 	const { email, token, password, name } = req.body;
 	try {
 		// Verify token
@@ -525,11 +595,21 @@ app.post('/admin/signup', async (req, res) => {
 			SET password_hash = $2, name = $3
 		`, [email, hashedPassword, name || email]);
 
-		// Auto login
-		req.session.admin = true;
-		req.session.adminEmail = email;
-		req.session.adminName = name || email;
-		res.redirect('/admin/dashboard');
+		// invalidate the token after use
+		await pool.query('DELETE FROM invite_tokens WHERE email = $1', [email]);
+
+        // Regenerate session to prevent fixation
+        req.session.regenerate((err) => {
+            if (err) {
+                console.error('Session regeneration error:', err);
+                return res.send('Error creating account');
+            }
+			// Auto login
+			req.session.admin = true;
+			req.session.adminEmail = email;
+			req.session.adminName = name || email;
+			res.redirect('/admin/dashboard');
+        });
 	} catch (e) {
 		console.error(e);
 		res.send('Error creating account');
@@ -538,6 +618,10 @@ app.post('/admin/signup', async (req, res) => {
 
 // Delete Admin
 app.post('/admin/delete-admin', requireAdmin, async (req, res) => {
+	if (req.cookies['XSRF-TOKEN'] !== req.body._csrf) {
+		return res.status(403).send('CSRF token mismatch');
+	}
+
 	const { id } = req.body;
 	try {
 		await pool.query('DELETE FROM admins WHERE id = $1', [id]);
