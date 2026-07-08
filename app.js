@@ -7,6 +7,10 @@ const { Pool } = require('pg');
 const session = require('express-session');
 const PgSession = require('connect-pg-simple')(session);
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
+
+const app = express();
+
 const BASE_URL = process.env.BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
 
 // Rate limiter for admin login
@@ -25,7 +29,23 @@ const contactLimiter = rateLimit({
 	message: 'Too many submissions. Please try again later.'
 });
 
-const app = express();
+app.use(helmet({
+  contentSecurityPolicy: false, // We'll set this manually next
+  crossOriginEmbedderPolicy: false,
+}));
+
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "default-src 'self'; " +
+    "script-src 'self' 'unsafe-inline' https://www.google.com/recaptcha/ https://www.gstatic.com; " +
+    "style-src 'self' 'unsafe-inline'; " +
+    "img-src 'self' data:; " +
+    "frame-ancestors 'none';"
+  );
+  next();
+});
+
 const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
@@ -268,43 +288,44 @@ app.post('/admin/forgot-password', async (req, res) => {
 	const { email } = req.body;
 	try {
 		const user = await pool.query('SELECT * FROM admins WHERE email = $1', [email]);
-		if (user.rows.length === 0) {
-			return res.render('admin-forgot-password', { sent: false, error: true });
+
+        if (user.rows.length > 0) {
+            // Only send email if user exists
+			const token = crypto.randomBytes(32).toString('hex');
+			const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
+
+			await pool.query(`
+				INSERT INTO password_reset_tokens (email, token, expires_at)
+				VALUES ($1, $2, $3)
+				ON CONFLICT (email) DO UPDATE 
+				SET token = $2, expires_at = $3
+			`, [email, token, expiresAt]);
+
+			const resetLink = `${BASE_URL}/admin/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
+
+			const transporter = nodemailer.createTransport({
+				service: 'gmail',
+				auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
+			});
+
+			await transporter.sendMail({
+				from: `"Marlette Precinct Admin" <${process.env.EMAIL_USER}>`,
+				to: email,
+				subject: "Password Reset Request",
+				html: `
+					<h2>Reset Your Password</h2>
+					<p>Click the link below to reset your admin password:</p>
+					<p><a href="${resetLink}" style="background:#1D3557;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;">Reset Password</a></p>
+					<p><small>This link expires in 2 hours.</small></p>
+				`
+			});
 		}
 
-		const token = crypto.randomBytes(32).toString('hex');
-		const expiresAt = new Date(Date.now() + 2 * 60 * 60 * 1000); // 2 hours
-
-		await pool.query(`
-			INSERT INTO password_reset_tokens (email, token, expires_at)
-			VALUES ($1, $2, $3)
-			ON CONFLICT (email) DO UPDATE 
-			SET token = $2, expires_at = $3
-		`, [email, token, expiresAt]);
-
-		const resetLink = `${BASE_URL}/admin/reset-password?token=${token}&email=${encodeURIComponent(email)}`;
-
-		const transporter = nodemailer.createTransport({
-			service: 'gmail',
-			auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS }
-		});
-
-		await transporter.sendMail({
-			from: `"Marlette Precinct Admin" <${process.env.EMAIL_USER}>`,
-			to: email,
-			subject: "Password Reset Request",
-			html: `
-				<h2>Reset Your Password</h2>
-				<p>Click the link below to reset your admin password:</p>
-				<p><a href="${resetLink}" style="background:#1D3557;color:white;padding:12px 24px;text-decoration:none;border-radius:8px;">Reset Password</a></p>
-				<p><small>This link expires in 2 hours.</small></p>
-			`
-		});
-
+        // Always show success (even if email doesn't exist)
 		res.render('admin-forgot-password', { sent: true, error: false });
 	} catch (e) {
 		console.error(e);
-		res.render('admin-forgot-password', { sent: false, error: true });
+        res.render('admin-forgot-password', { sent: true, error: false });
 	}
 });
 
@@ -361,7 +382,7 @@ app.get('/admin/dashboard', requireAdmin, async (req, res) => {
 		});
 	} catch (e) {
 		console.error(e);
-		res.send('Database error');
+		res.send('An error occurred. Please try again.');
 	}
 });
 
@@ -449,7 +470,7 @@ app.get('/admin/users', requireAdmin, async (req, res) => {
 		});
 	} catch (e) {
 		console.error(e);
-		res.send('Database error: '+e.message);
+		res.send('An error occurred. Please try again.');
 	}
 });
 
